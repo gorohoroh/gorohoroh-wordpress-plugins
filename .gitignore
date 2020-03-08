@@ -1,0 +1,21 @@
+# Libraries
+vendor/
+
+# Other WordPress plugins
+akismet/
+debug-bar/
+jetpack/
+query-monitor/
+wc-smooth-generator/
+woocommerce/
+woocommerce-admin/
+woocommerce-services/
+hello.php
+index.php
+
+# PHPStorm
+.idea
+
+# PHPCS
+.phpcs.xml
+phpcs.xml
