@@ -20,6 +20,14 @@ function add_activity_panel_inbox_welcome_note() {
     if ( ! class_exists( 'WC_Data_Store' ) ) return;
 
     $data_store = WC_Data_Store::load( 'admin-note' );
+/*
+ * So the examples in https://woocommerce.github.io/woocommerce-admin/#/examples/activity-panel-inbox are apparently outdated
+ * (11 months ago) and use some APIs that WC no longer provides. It does make sense to investigate what's going on, and possibly
+ * submit a PR. For an example of internal usage of notes, see class WC_Admin_Notes_New_Sales_Record, lines 75 and below.
+ * Try setting up WP debugging in PhpStorm:
+ * * https://www.jetbrains.com/help/phpstorm/zero-configuration-debugging.html
+ * * https://stackoverflow.com/questions/27549460/how-to-debug-wordpress-theme-with-phpstorm
+ * */
 
     // First, see if we've already created this kind of note so we don't do it again.
     $existing_note = WC_Admin_Notes::get_note( get_note_name() );
