@@ -42,3 +42,16 @@ function add_gorohoroh_analytics_page_register_script() {
 }
 
 add_action( 'admin_enqueue_scripts', 'add_gorohoroh_analytics_page_register_script' );
+
+add_filter('woocommerce_analytics_report_menu_items', 'add_to_analytics_menu');
+
+function add_to_analytics_menu($report_pages) {
+    $report_pages[] = array(
+        'id' => 'woocommerce-gorohoroh-analytics-page',
+        'title' => 'Gorohoroh\'s sample Analytics page',
+        'parent' => 'woocommerce-analytics',
+        'path' => '/analytics/gorohoroh-analytics-page',
+    );
+
+    return $report_pages;
+}
