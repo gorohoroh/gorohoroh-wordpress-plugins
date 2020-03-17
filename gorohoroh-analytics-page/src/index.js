@@ -2,9 +2,7 @@ import './index.scss';
 import {Component as ReactComponent} from '@wordpress/element';
 import {addFilter} from '@wordpress/hooks';
 import {__} from '@wordpress/i18n';
-import OrdinalFrame from 'semiotic/lib/OrdinalFrame'
-import {VictoryBar, VictoryChart, VictoryLabel} from 'victory';
-import { Chart } from '@woocommerce/components';
+import {Chart} from '@woocommerce/components';
 
 addFilter('woocommerce_admin_reports_list', 'gorohoroh-analytics-page', (reports) => {
     return [
@@ -21,44 +19,77 @@ class ValuesByCountSortedForColumns extends ReactComponent {
 
     constructor(props) {
         super(props);
-        this.state = {campaignReport: {
-                "reportTitle": "Campaign Objective",
-                "reportValues": [
-                    { "key": "Conversions", "value": 132 },
-                    { "key": "Traffic", "value": 37 },
-                    { "key": "Post engagement", "value": 8 },
-                    { "key": "Reach", "value": 4 },
-                    { "key": "Video Views", "value": 2 }
-                ]
-            }, }
+        this.state = { data: this.getReportData() }
     }
 
     render() {
-        const chartHeight = this.state.campaignReport.reportValues.length * 30;
-        return <div className="chart-container">
-            <h2>{this.state.campaignReport.reportTitle} by count</h2>
-            <Chart data={ this.state.campaignReport.reportValues } title="Example Chart" layout="time-comparison" />
-            <OrdinalFrame data={this.state.campaignReport.reportValues}
-                          size={[1000, chartHeight]}
-                          rAccessor={"value"}
-                          oAccessor={"key"}
-                          type="bar"
-                          projection={"horizontal"}
-                          oLabel={d => <text className="chart-bar-label">{d}</text>}
-                          pieceClass="chart-bar"
-                          axis={{orient: "bottom"}}
-            />
-            <VictoryChart domainPadding={10}>
-                <VictoryBar data={this.state.campaignReport.reportValues}
-                            padding={10}
-                            x="key"
-                            y="value"
-                            width={500}
-                            height={chartHeight}
-                            horizontal={true}
-                            labelComponent={<VictoryLabel dy={30}/>}
-                />
-            </VictoryChart>
-        </div>;
+        return <Chart data={this.state.data} title="Example Chart" layout="time-comparison"/>;
+    }
+
+
+    getReportData() {
+        return [
+            {
+                date: '2018-05-30T00:00:00',
+                Hoodie: {
+                    label: 'Hoodie',
+                    value: 21599,
+                },
+                Sunglasses: {
+                    label: 'Sunglasses',
+                    value: 38537,
+                },
+                Cap: {
+                    label: 'Cap',
+                    value: 106010,
+                },
+            },
+            {
+                date: '2018-05-31T00:00:00',
+                Hoodie: {
+                    label: 'Hoodie',
+                    value: 14205,
+                },
+                Sunglasses: {
+                    label: 'Sunglasses',
+                    value: 24721,
+                },
+                Cap: {
+                    label: 'Cap',
+                    value: 70131,
+                },
+            },
+            {
+                date: '2018-06-01T00:00:00',
+                Hoodie: {
+                    label: 'Hoodie',
+                    value: 10581,
+                },
+                Sunglasses: {
+                    label: 'Sunglasses',
+                    value: 19991,
+                },
+                Cap: {
+                    label: 'Cap',
+                    value: 53552,
+                },
+            },
+            {
+                date: '2018-06-02T00:00:00',
+                Hoodie: {
+                    label: 'Hoodie',
+                    value: 9250,
+                },
+                Sunglasses: {
+                    label: 'Sunglasses',
+                    value: 16072,
+                },
+                Cap: {
+                    label: 'Cap',
+                    value: 47821,
+                },
+            },
+        ]
+
     }
 }
