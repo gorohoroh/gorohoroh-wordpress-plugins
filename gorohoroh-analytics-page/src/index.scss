@@ -1,1 +1,16 @@
-// Add styles here.
+.chart-container h2 {
+  margin-top: 40px;
+}
+
+.chart-bar {
+  fill: #23abe5;
+}
+
+.chart-bar-label {
+  font-size: 15px;
+  transform: translate(10px, 5px);
+}
+
+.tick-line path {
+  stroke: none;
+}
