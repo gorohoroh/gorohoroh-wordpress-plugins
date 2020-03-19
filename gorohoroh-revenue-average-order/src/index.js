@@ -3,26 +3,8 @@ import {default as Currency} from "@woocommerce/currency";
 import { CURRENCY as storeCurrencySetting } from "@woocommerce/settings";
 
 const NAMESPACE = "gorohoroh-revenue-average-order";
-
-const averageOrderValueFilter = {
-    key: 'average_order_value',
-    label: 'Average order value',
-    order: 'desc',
-    orderby: 'average_order_value',
-    type: 'currency',
-};
-
 const storeCurrency = new Currency(storeCurrencySetting);
 
-// Trying to hook to this filter defined in report's config.js. No luck.
-addFilter('woocommerce_admin_revenue_report_advanced_filters', NAMESPACE, (filters) => {
-    return {
-        ...filters, averageOrderValueFilter
-    }
-});
-
-// Looks like it's better to try hooking into the `report-table` component's `'woocommerce_admin_report_table'` hook,
-// as the `table-column` example does. OK, let's see
 addFilter(
     'woocommerce_admin_report_table',
     NAMESPACE,
