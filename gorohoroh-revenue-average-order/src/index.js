@@ -1,6 +1,6 @@
 import {addFilter} from '@wordpress/hooks'
 import {default as Currency} from "@woocommerce/currency";
-import { CURRENCY as storeCurrencySetting } from "@woocommerce/settings";
+import {CURRENCY as storeCurrencySetting} from "@woocommerce/settings";
 
 const NAMESPACE = "gorohoroh-revenue-average-order";
 const storeCurrency = new Currency(storeCurrencySetting);
@@ -8,13 +8,13 @@ const storeCurrency = new Currency(storeCurrencySetting);
 addFilter(
     'woocommerce_admin_report_table',
     NAMESPACE,
-    ( reportTableData ) => {
-        if ( reportTableData.endpoint !== 'revenue' || ! reportTableData.items ) return reportTableData;
+    (reportTableData) => {
+        if (reportTableData.endpoint !== 'revenue' || !reportTableData.items) return reportTableData;
 
         const newHeaders = [
             ...reportTableData.headers,
             {
-                label: 'Avg Sale Value',
+                label: 'Avg Order Value',
                 key: 'average_order_value',
                 required: false,
                 isSortable: true,
@@ -22,17 +22,17 @@ addFilter(
             },
         ];
 
-        const newRows = reportTableData.rows.map( ( row, index ) => {
-            const revenueReportRow = reportTableData.items.data[ index ].subtotals;
-            const averageSaleValue = revenueReportRow.orders_count <= 0 ? 0 : revenueReportRow.total_sales / revenueReportRow.orders_count;
+        const newRows = reportTableData.rows.map((row, index) => {
+            const revenueReportRow = reportTableData.items.data[index].subtotals;
+            const averageOrderValue = revenueReportRow.orders_count <= 0 ? 0 : revenueReportRow.total_sales / revenueReportRow.orders_count;
             return [
                 ...row,
                 {
-                    display: storeCurrency.render(averageSaleValue),
-                    value: storeCurrency.formatDecimal(averageSaleValue),
+                    display: storeCurrency.render(averageOrderValue),
+                    value: storeCurrency.formatDecimal(averageOrderValue),
                 }
             ];
-        } );
+        });
 
         reportTableData.headers = newHeaders;
         reportTableData.rows = newRows;
