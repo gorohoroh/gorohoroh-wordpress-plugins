@@ -48,7 +48,7 @@ add_filter('woocommerce_analytics_report_menu_items', 'add_to_analytics_menu');
 function add_to_analytics_menu($report_pages) {
     $report_pages[] = array(
         'id' => 'gorohoroh-sales-by-country',
-        'title' => 'Gorohoroh\'s Sales by Country',
+        'title' => 'Sales by Country',
         'parent' => 'woocommerce-analytics',
         'path' => '/analytics/gorohoroh-sales-by-country',
     );

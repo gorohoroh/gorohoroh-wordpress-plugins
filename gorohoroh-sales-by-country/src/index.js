@@ -9,8 +9,8 @@ addFilter('woocommerce_admin_reports_list', 'gorohoroh-sales-by-country', (repor
         ...reports,
         {
             report: 'gorohoroh-sales-by-country',
-            title: __('Gorohoroh\'s Sales by Country (title)', 'gorohoroh-sales-by-country'),
-            component: ValuesByCountSortedForColumns
+            title: __('Sales by Country', 'gorohoroh-sales-by-country'),
+            component: Text
         },
     ];
 });
