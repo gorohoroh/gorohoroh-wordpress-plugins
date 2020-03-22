@@ -36,6 +36,7 @@ const requestToHandle = request => {
 
 module.exports = {
 	...defaultConfig,
+	devtool: 'inline-source-map',
 	plugins: [
 		...defaultConfig.plugins.filter(
 			plugin => plugin.constructor.name !== 'DependencyExtractionWebpackPlugin',
