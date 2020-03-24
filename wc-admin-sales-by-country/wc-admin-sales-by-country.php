@@ -42,3 +42,16 @@ function add_wc_admin_sales_by_country_register_script() {
 }
 
 add_action( 'admin_enqueue_scripts', 'add_wc_admin_sales_by_country_register_script' );
+
+add_filter('woocommerce_analytics_report_menu_items', 'add_to_analytics_menu');
+
+function add_to_analytics_menu($report_pages) {
+    $report_pages[] = array(
+        'id' => 'wc-admin-sales-by-country',
+        'title' => 'Sales by Country',
+        'parent' => 'woocommerce-analytics',
+        'path' => '/analytics/sales-by-country',
+    );
+
+    return $report_pages;
+}
