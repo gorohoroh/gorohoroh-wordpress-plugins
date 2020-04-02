@@ -65,12 +65,20 @@ class SalesByCountryReport extends ReactComponent {
 
     prepareData(countries, orders, customers) {
         const ordersWithCountries = this.getOrdersWithCountries(orders, customers, countries);
-        const data = this.getPerCountryData(ordersWithCountries);
+        let data = this.getPerCountryData(ordersWithCountries);
+
         data.totals = {
             total_sales: this.getTotalNumber(data.countries, "sales"),
             orders: this.getTotalNumber(data.countries, "orders"),
-            countries: data.countries.length
+            countries: data.countries.length,
         };
+
+        data.countries = data.countries.map(country => {
+                country.stats.sales_percentage = `${Math.round(country.stats.sales / data.totals.total_sales * 10000) / 100 }%`;
+                country.stats.average_order_value = country.stats.sales / country.stats.orders;
+            return country;
+        });
+
         return data;
     }
 
