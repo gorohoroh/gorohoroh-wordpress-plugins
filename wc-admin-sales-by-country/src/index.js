@@ -28,6 +28,11 @@ class SalesByCountryReport extends ReactComponent {
         const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
         const dateQuery = {period, compare, before, after, primaryDate, secondaryDate};
 
+        this.state = {
+            dateQuery: dateQuery,
+            path: path,
+        };
+
         const defaultQueryParameters =
             // this.addQueryParameter(dateQuery, "after") +
             "&after=2020-03-01T00%3A00%3A00" +
@@ -42,35 +47,40 @@ class SalesByCountryReport extends ReactComponent {
             "countries": "/wc/v3/data/countries?_fields=code,name" + defaultQueryParameters,
             "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales" + defaultQueryParameters,
             "customers": "/wc-analytics/reports/customers?_fields=id,country" + defaultQueryParameters
-    };
+        };
 
-        const perCountryData = Promise.all([
+        Promise.all([
             apiFetch({path: endPoints.countries}),
             apiFetch({path: endPoints.orders}),
             apiFetch({path: endPoints.customers})
         ])
-            .then(([countries, orders, customers]) => this.prepareData(countries, orders, customers))
+            .then(([countries, orders, customers]) => {
+                const data = this.prepareData(countries, orders, customers);
+                this.setState({data: data})
+            })
             .catch(err => console.log(err));
-
-        this.state = {
-            dateQuery: dateQuery,
-            path: path,
-            data: perCountryData
-        }
 
         // TODO fetch only countries represented in the current date range's set of orders - see discussion at https://a8c.slack.com/archives/GTNUWF8MT/p1585756629003400
     }
 
     prepareData(countries, orders, customers) {
         const ordersWithCountries = this.getOrdersWithCountries(orders, customers, countries);
-        return this.getPerCountryData(ordersWithCountries);
+        const data = this.getPerCountryData(ordersWithCountries);
+        data.totals = {
+            total_sales: this.getTotalSales(data.countries),
+            orders: this.getTotalOrders(data.countries),
+            countries: data.countries.length
+        };
+        return data;
     }
 
     getPerCountryData(ordersWithCountries) {
         return ordersWithCountries.reduce((accumulator, currentObject) => {
             const countryCode = currentObject['country_code'];
 
-            if (!accumulator.find(item => item.country_code === countryCode)) {
+            if (!accumulator.countries) accumulator.countries = [];
+
+            if (!accumulator.countries.find(item => item.country_code === countryCode)) {
                 const countryObjectTemplate = {
                     "country": currentObject['country'],
                     "country_code": countryCode,
@@ -81,15 +91,15 @@ class SalesByCountryReport extends ReactComponent {
                         "average_order_value": 0
                     }
                 };
-                accumulator.push(countryObjectTemplate)
+                accumulator.countries.push(countryObjectTemplate)
             }
 
-            const countryIndexInAccumulator = accumulator.findIndex(item => item.country_code === countryCode);
-            accumulator[countryIndexInAccumulator].stats.sales += currentObject.total_sales;
-            accumulator[countryIndexInAccumulator].stats.orders++;
+            const countryIndexInAccumulator = accumulator.countries.findIndex(item => item.country_code === countryCode);
+            accumulator.countries[countryIndexInAccumulator].stats.sales += currentObject.total_sales;
+            accumulator.countries[countryIndexInAccumulator].stats.orders++;
 
             return accumulator;
-        }, []);
+        }, {});
     }
 
     getOrdersWithCountries(orders, customers, countries) {
@@ -103,61 +113,53 @@ class SalesByCountryReport extends ReactComponent {
         });
     }
 
+    getTotalSales(data) {
+        return data.reduce((accumulator, currentObject) => accumulator + currentObject.stats.sales, 0);
+    }
+
+    getTotalOrders(data) {
+        return data.reduce((accumulator, currentObject) => accumulator + currentObject.stats.orders, 0);
+    }
+
     addQueryParameter(dateQuery, parameterName) {
         const parameterInDateQuery = dateQuery[parameterName];
         return parameterInDateQuery ? `&${parameterName}=${parameterInDateQuery}`: '';
     }
 
     render() {
-        return <Fragment>
-            <ReportFilters
-                dateQuery={this.state.dateQuery}
-                query={this.props.query}
-                path={this.props.path}
-                // report="revenue"
-                // filters={filters}
-                // advancedFilters={advancedFilters}
-            />
-            <SummaryList>
-                { () => {
-                    return [
-                        <SummaryNumber
-                            key="sales"
-                            value={ '$33829.40' }
-                            label="Total Sales"
-                            // delta={ 29 }
-                            // href="/analytics/report"
-                        />,
-                        <SummaryNumber
-                            key="countries"
-                            value={ '8' }
-                            label="Countries"
-                            // delta={ -10 }
-                            // href="/analytics/report"
-                            // selected
-                        />,
-                        <SummaryNumber
-                            key="orders"
-                            value={ '8' }
-                            label="Orders"
-                            // delta={ -10 }
-                            // href="/analytics/report"
-                            // selected
-                        />,
-                    ];
-                } }
-            </SummaryList>
-            <Chart chartType="bar" data={chartData} title="Sales by Country" layout="item-comparison"/>
-            <TableCard
-                className="table_top_countries"
-                title="Top Countries"
-                rows={tableData.rows}
-                headers={tableData.headers}
-                query={{page: 2}}
-                rowsPerPage={7}
-                totalRows={10}
-                summary={tableData.summary}
-            />
-        </Fragment>
+        if (!this.state.data) {return <p>Waiting for data...</p>} else {
+
+            const data = this.state.data;
+            const { total_sales, orders, countries } = data.totals;
+
+            return <Fragment>
+                <ReportFilters
+                    dateQuery={this.state.dateQuery}
+                    query={this.props.query}
+                    path={this.props.path}
+                    // report="revenue"
+                    // filters={filters}
+                    // advancedFilters={advancedFilters}
+                />
+                <SummaryList>
+                    {() => [
+                        <SummaryNumber key="sales" value={total_sales} label="Total Sales"/>,
+                        <SummaryNumber key="countries" value={countries} label="Countries"/>,
+                        <SummaryNumber key="orders" value={orders} label="Orders"/>
+                    ]}
+                </SummaryList>
+                <Chart chartType="bar" data={chartData} title="Sales by Country" layout="item-comparison"/>
+                <TableCard
+                    className="table_top_countries"
+                    title="Top Countries"
+                    rows={tableData.rows}
+                    headers={tableData.headers}
+                    query={{page: 2}}
+                    rowsPerPage={7}
+                    totalRows={10}
+                    summary={tableData.summary}
+                />
+            </Fragment>
+        }
     }
 }
