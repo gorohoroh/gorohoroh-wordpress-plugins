@@ -67,8 +67,8 @@ class SalesByCountryReport extends ReactComponent {
         const ordersWithCountries = this.getOrdersWithCountries(orders, customers, countries);
         const data = this.getPerCountryData(ordersWithCountries);
         data.totals = {
-            total_sales: this.getTotalSales(data.countries),
-            orders: this.getTotalOrders(data.countries),
+            total_sales: this.getTotalNumber(data.countries, "sales"),
+            orders: this.getTotalNumber(data.countries, "orders"),
             countries: data.countries.length
         };
         return data;
@@ -113,12 +113,9 @@ class SalesByCountryReport extends ReactComponent {
         });
     }
 
-    getTotalSales(data) {
-        return data.reduce((accumulator, currentObject) => accumulator + currentObject.stats.sales, 0);
-    }
-
-    getTotalOrders(data) {
-        return data.reduce((accumulator, currentObject) => accumulator + currentObject.stats.orders, 0);
+    getTotalNumber(data, property) {
+        const propertyTotal = data.reduce((accumulator, currentObject) => accumulator + currentObject.stats[property], 0);
+        return Math.round(propertyTotal * 100) / 100;
     }
 
     addQueryParameter(dateQuery, parameterName) {
