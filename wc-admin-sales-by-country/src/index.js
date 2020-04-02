@@ -3,7 +3,7 @@ import {addFilter} from '@wordpress/hooks';
 import {__} from '@wordpress/i18n';
 import {Component as ReactComponent, Fragment} from '@wordpress/element';
 import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard} from "@woocommerce/components";
-import {chartData, tableData} from './mockData'
+import {chartData} from './mockData'
 import {getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from '@wordpress/api-fetch';
 
@@ -131,6 +131,47 @@ class SalesByCountryReport extends ReactComponent {
 
             const data = this.state.data;
             const { total_sales, orders, countries } = data.totals;
+
+            const tableData = {
+                headers: [],
+                rows: [],
+                summary: []
+            };
+
+            tableData.headers = [
+                {key: 'country', label: 'Country'},
+                {key: 'sales-absolute', label: 'Sales'},
+                {key: 'sales-percent', label: 'Sales (percentage)'},
+                {key: 'orders', label: 'Number of Orders'},
+                {key: 'avg-order', label: 'Average Order Value'},
+            ];
+
+/*
+            [
+                {display: 'France', value: 1}, // item.country
+                {display: '₽33,023', value: 33023}, // item.stats.sales
+                {display: '63.6%', value: 63.6}, // item.stats.sales_percentage
+                {display: 1, value: 1}, // item.stats.orders
+                {display: '33023', value: 33023}, // item.stats.average_order_value
+            ]
+*/
+
+            data.countries.map(item => {
+                const row = [
+                    {display: item.country, value: 1},
+                    {display: item.stats.sales, value: item.stats.sales},
+                    {display: item.stats.sales_percentage, value: item.stats.sales_percentage},
+                    {display: item.stats.orders, value: item.stats.orders},
+                    {display: item.stats.average_order_value, value: item.stats.average_order_value},
+                ];
+                tableData.rows.push(row);
+            });
+
+            tableData.summary = [
+                {key: "sales", label: 'Sales in this period', value: total_sales},
+                {key: "orders", label: 'Orders in this period', value: orders},
+                {key: "countries", label: 'Countries in this period', value: countries},
+            ];
 
             return <Fragment>
                 <ReportFilters
