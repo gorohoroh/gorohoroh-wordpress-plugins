@@ -2,11 +2,9 @@ import './index.scss';
 import {addFilter} from '@wordpress/hooks';
 import {__} from '@wordpress/i18n';
 import {Component as ReactComponent, Fragment} from '@wordpress/element';
-import {Card, Chart, ReportFilters, SummaryList, SummaryNumber, TableCard} from "@woocommerce/components";
+import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard} from "@woocommerce/components";
 import {chartData, tableData} from './mockData'
 import {getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
-import {getResourceIdentifier} from "../../woocommerce-admin/client/wc-api/utils";
-import {NAMESPACE} from "../../woocommerce-admin/client/wc-api/constants";
 import apiFetch from '@wordpress/api-fetch';
 
 addFilter('woocommerce_admin_reports_list', 'wc-admin-sales-by-country', (reports) => {
@@ -30,12 +28,11 @@ class SalesByCountryReport extends ReactComponent {
         const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
         const dateQuery = {period, compare, before, after, primaryDate, secondaryDate};
 
-/*
         const endPoints = {
             "countries": "/wc/v3/data/countries?_fields=code,name",
             "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales",
             "customers": "/wc-analytics/reports/customers?_fields=id,country"
-        };
+    };
 
         const defaultQueryParameters =
             // this.addQueryParameter(dateQuery, "after") +
@@ -47,24 +44,30 @@ class SalesByCountryReport extends ReactComponent {
             "&per_page=100" +
             "&_locale=user";
 
-        const orders = this.getRestData(endPoints.orders + defaultQueryParameters);
-        const customers = this.getRestData(endPoints.customers + defaultQueryParameters);
+        const perCountryData = Promise.all([
+            apiFetch({path: endPoints.countries + defaultQueryParameters}),
+            apiFetch({path: endPoints.orders + defaultQueryParameters}),
+            apiFetch({path: endPoints.customers + defaultQueryParameters})
+        ])
+            .then(([countries, orders, customers]) => this.prepareData(countries, orders, customers))
+            .catch(err => console.log(err));
 
-        // TODO cache this
+        this.state = {
+            dateQuery: dateQuery,
+            path: path,
+            data: perCountryData
+        }
+
         // TODO fetch only countries represented in the current date range's set of orders - see discussion at https://a8c.slack.com/archives/GTNUWF8MT/p1585756629003400
-        const countries = this.getRestData(endPoints.countries + defaultQueryParameters);
+    }
 
-        const ordersWithCountries = orders.map(order => {
-            order.country_code = customers.find(item => item.id === order.customer_id).country;
+    prepareData(countries, orders, customers) {
+        const ordersWithCountries = this.getOrdersWithCountries(orders, customers, countries);
+        return this.getPerCountryData(ordersWithCountries);
+    }
 
-            const country = countries.find(item => item.code === order.country_code);
-            order.country = country ? country.name : "Unknown country";
-
-            return order;
-        });
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-        const perCountryData = ordersWithCountries.reduce((accumulator, currentObject) => {
+    getPerCountryData(ordersWithCountries) {
+        return ordersWithCountries.reduce((accumulator, currentObject) => {
             const countryCode = currentObject['country_code'];
 
             if (!accumulator.find(item => item.country_code === countryCode)) {
@@ -87,26 +90,17 @@ class SalesByCountryReport extends ReactComponent {
 
             return accumulator;
         }, []);
-*/
-
-        this.state = {
-            dateQuery: dateQuery,
-            path: path,
-            // countries: countries,
-            // perCountryData: perCountryData
-        }
     }
 
-    getRestData(query) {
-        // https://github.com/WordPress/gutenberg/tree/master/packages/api-fetch
-        return apiFetch({path: query})
-            .then(response => {
-                response.json();
-                console.log(response);
-                console.log(query);
-            })
-            .catch(error => console.log(error));
+    getOrdersWithCountries(orders, customers, countries) {
+        return orders.map(order => {
+            order.country_code = customers.find(item => item.id === order.customer_id).country;
 
+            const country = countries.find(item => item.code === order.country_code);
+            order.country = country ? country.name : "Unknown country";
+
+            return order;
+        });
     }
 
     addQueryParameter(dateQuery, parameterName) {
@@ -115,7 +109,6 @@ class SalesByCountryReport extends ReactComponent {
     }
 
     render() {
-
         return <Fragment>
             <ReportFilters
                 dateQuery={this.state.dateQuery}
@@ -125,7 +118,6 @@ class SalesByCountryReport extends ReactComponent {
                 // filters={filters}
                 // advancedFilters={advancedFilters}
             />
-
             <SummaryList>
                 { () => {
                     return [
@@ -155,7 +147,6 @@ class SalesByCountryReport extends ReactComponent {
                     ];
                 } }
             </SummaryList>
-
             <Chart chartType="bar" data={chartData} title="Sales by Country" layout="item-comparison"/>
             <TableCard
                 className="table_top_countries"
