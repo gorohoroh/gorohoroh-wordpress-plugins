@@ -28,12 +28,6 @@ class SalesByCountryReport extends ReactComponent {
         const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
         const dateQuery = {period, compare, before, after, primaryDate, secondaryDate};
 
-        const endPoints = {
-            "countries": "/wc/v3/data/countries?_fields=code,name",
-            "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales",
-            "customers": "/wc-analytics/reports/customers?_fields=id,country"
-    };
-
         const defaultQueryParameters =
             // this.addQueryParameter(dateQuery, "after") +
             "&after=2020-03-01T00%3A00%3A00" +
@@ -44,10 +38,16 @@ class SalesByCountryReport extends ReactComponent {
             "&per_page=100" +
             "&_locale=user";
 
+        const endPoints = {
+            "countries": "/wc/v3/data/countries?_fields=code,name" + defaultQueryParameters,
+            "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales" + defaultQueryParameters,
+            "customers": "/wc-analytics/reports/customers?_fields=id,country" + defaultQueryParameters
+    };
+
         const perCountryData = Promise.all([
-            apiFetch({path: endPoints.countries + defaultQueryParameters}),
-            apiFetch({path: endPoints.orders + defaultQueryParameters}),
-            apiFetch({path: endPoints.customers + defaultQueryParameters})
+            apiFetch({path: endPoints.countries}),
+            apiFetch({path: endPoints.orders}),
+            apiFetch({path: endPoints.customers})
         ])
             .then(([countries, orders, customers]) => this.prepareData(countries, orders, customers))
             .catch(err => console.log(err));
