@@ -138,11 +138,11 @@ export class SalesByCountryReport extends ReactComponent {
             };
 
             tableData.headers = [
-                {key: 'country', label: 'Country'},
-                {key: 'sales-absolute', label: 'Sales'},
-                {key: 'sales-percent', label: 'Sales (percentage)'},
-                {key: 'orders', label: 'Number of Orders'},
-                {key: 'avg-order', label: 'Average Order Value'},
+                {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
+                {key: 'sales-absolute', label: 'Sales', isSortable: true, defaultSort: true, defaultOrder: 'desc', isNumeric: true},
+                {key: 'sales-percent', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
+                {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
+                {key: 'avg-order', label: 'Average Order Value', isSortable: true, isNumeric: true},
             ];
 
             data.countries.map(item => {
