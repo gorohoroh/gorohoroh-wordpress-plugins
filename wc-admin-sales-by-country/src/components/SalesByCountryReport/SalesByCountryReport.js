@@ -4,6 +4,8 @@ import {getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
 import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard} from "@woocommerce/components";
 import {chartData} from "./mockData";
+import {default as Currency} from "@woocommerce/currency";
+import {CURRENCY as storeCurrencySetting} from "@woocommerce/settings";
 
 export class SalesByCountryReport extends ReactComponent {
 
@@ -15,9 +17,12 @@ export class SalesByCountryReport extends ReactComponent {
         const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
         const dateQuery = {period, compare, before, after, primaryDate, secondaryDate};
 
+        const storeCurrency = new Currency(storeCurrencySetting);
+
         this.state = {
             dateQuery: dateQuery,
             path: path,
+            currency: storeCurrency
         };
 
         const defaultQueryParameters =
@@ -61,7 +66,7 @@ export class SalesByCountryReport extends ReactComponent {
         };
 
         data.countries = data.countries.map(country => {
-            country.stats.sales_percentage = `${Math.round(country.stats.sales / data.totals.total_sales * 10000) / 100}%`;
+            country.stats.sales_percentage = Math.round(country.stats.sales / data.totals.total_sales * 10000) / 100;
             country.stats.average_order_value = country.stats.sales / country.stats.orders;
             return country;
         });
@@ -123,7 +128,7 @@ export class SalesByCountryReport extends ReactComponent {
             return <p>Waiting for data...</p>
         } else {
 
-            const data = this.state.data;
+            const {data, currency} = this.state;
             const {total_sales, orders, countries} = data.totals;
 
             const tableData = {
@@ -140,29 +145,34 @@ export class SalesByCountryReport extends ReactComponent {
                 {key: 'avg-order', label: 'Average Order Value'},
             ];
 
-            /*
-                        [
-                            {display: 'France', value: 1}, // item.country
-                            {display: '₽33,023', value: 33023}, // item.stats.sales
-                            {display: '63.6%', value: 63.6}, // item.stats.sales_percentage
-                            {display: 1, value: 1}, // item.stats.orders
-                            {display: '33023', value: 33023}, // item.stats.average_order_value
-                        ]
-            */
-
             data.countries.map(item => {
                 const row = [
-                    {display: item.country, value: 1},
-                    {display: item.stats.sales, value: item.stats.sales},
-                    {display: item.stats.sales_percentage, value: item.stats.sales_percentage},
-                    {display: item.stats.orders, value: item.stats.orders},
-                    {display: item.stats.average_order_value, value: item.stats.average_order_value},
+                    {
+                        display: item.country,
+                        value: item.country
+                    },
+                    {
+                        display: currency.render(item.stats.sales),
+                        value: item.stats.sales
+                    },
+                    {
+                        display: `${item.stats.sales_percentage}%`,
+                        value: item.stats.sales_percentage
+                    },
+                    {
+                        display: item.stats.orders,
+                        value: item.stats.orders
+                    },
+                    {
+                        display: currency.render(item.stats.average_order_value),
+                        value: item.stats.average_order_value
+                    },
                 ];
                 tableData.rows.push(row);
             });
 
             tableData.summary = [
-                {key: "sales", label: 'Sales in this period', value: total_sales},
+                {key: "sales", label: 'Sales in this period', value: currency.render(total_sales)},
                 {key: "orders", label: 'Orders in this period', value: orders},
                 {key: "countries", label: 'Countries in this period', value: countries},
             ];
@@ -178,7 +188,7 @@ export class SalesByCountryReport extends ReactComponent {
                 />
                 <SummaryList>
                     {() => [
-                        <SummaryNumber key="sales" value={total_sales} label="Total Sales"/>,
+                        <SummaryNumber key="sales" value={currency.render(total_sales)} label="Total Sales"/>,
                         <SummaryNumber key="countries" value={countries} label="Countries"/>,
                         <SummaryNumber key="orders" value={orders} label="Orders"/>
                     ]}
