@@ -2,10 +2,11 @@ import './SalesByCountryReport.scss';
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
-import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard, ChartPlaceholder, SummaryListPlaceholder, TablePlaceholder} from "@woocommerce/components";
-import {chartData} from "./mockData";
+import {Chart, ChartPlaceholder, ReportFilters, SummaryList, SummaryListPlaceholder, SummaryNumber, TableCard, TablePlaceholder} from "@woocommerce/components";
+import {chartData as mockChartData} from "./mockData";
 import {default as Currency} from "@woocommerce/currency";
 import {CURRENCY as storeCurrencySetting} from "@woocommerce/settings";
+import {CountryChart} from "../CountryChart/CountryChart";
 
 export class SalesByCountryReport extends ReactComponent {
 
@@ -219,7 +220,8 @@ export class SalesByCountryReport extends ReactComponent {
                             <SummaryNumber key="orders" value={orders} label="Orders"/>
                         ]}
                     </SummaryList>
-                    <Chart chartType="bar" data={chartData} title="Sales by Country" layout="item-comparison"/>
+                    <Chart chartType="bar" data={mockChartData} title="Sales by Country" layout="item-comparison"/>
+                    <CountryChart chartData={data.countries}/>
                     <TableCard
                         className="table_top_countries"
                         title="Top Countries"
