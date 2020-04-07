@@ -132,6 +132,7 @@ export class SalesByCountryReport extends ReactComponent {
 
     handleDateChange(newQuery) {
         const newDateQuery = this.createDateQuery(newQuery);
+        this.setState({dateQuery: newDateQuery});
         // TODO compare date ranges in old and new queries; don't fetch if they're equal, or a date range in the new query is within the date range in the old query
         this.fetchData(newDateQuery);
     }
