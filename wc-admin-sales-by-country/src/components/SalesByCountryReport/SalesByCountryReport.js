@@ -2,7 +2,7 @@ import './SalesByCountryReport.scss';
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
-import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard} from "@woocommerce/components";
+import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard, ChartPlaceholder, SummaryListPlaceholder, TablePlaceholder} from "@woocommerce/components";
 import {chartData} from "./mockData";
 import {default as Currency} from "@woocommerce/currency";
 import {CURRENCY as storeCurrencySetting} from "@woocommerce/settings";
@@ -19,7 +19,8 @@ export class SalesByCountryReport extends ReactComponent {
         this.state = {
             dateQuery: dateQuery,
             path: path,
-            currency: storeCurrency
+            currency: storeCurrency,
+            data: { loading: true }
         };
 
         this.handleDateChange = this.handleDateChange.bind(this);
@@ -41,7 +42,7 @@ export class SalesByCountryReport extends ReactComponent {
 
     fetchData(dateQuery) {
 
-        this.setState({loading: true});
+        if(!this.state.data.loading) this.setState({data: {loading: true}});
 
         const endPoints = {
             "countries": "/wc/v3/data/countries?_fields=code,name",
@@ -62,7 +63,7 @@ export class SalesByCountryReport extends ReactComponent {
             .then(([countries, orders, customers]) => {
                 // TODO Handle empty JSON returns (no data for a selected period). Right now they lead to errors from "reduce()" and indefinite "Waiting for data"
                 const data = this.prepareData(countries, orders, customers);
-                this.setState({data: data, loading: false})
+                this.setState({data: data})
             })
             .catch(err => console.log(err));
 
@@ -84,6 +85,8 @@ export class SalesByCountryReport extends ReactComponent {
             country.stats.average_order_value = country.stats.sales / country.stats.orders;
             return country;
         });
+
+        data.loading = false;
 
         return data;
     }
@@ -140,85 +143,94 @@ export class SalesByCountryReport extends ReactComponent {
     }
 
     render() {
-        if (this.state.loading) {
-            return <p>Waiting for data...</p>
-        } else {
 
-            const {data, currency, dateQuery} = this.state;
-            const {total_sales, orders, countries} = data.totals;
+        const tableData = {
+            headers: [],
+            rows: [],
+            summary: []
+        };
 
-            const tableData = {
-                headers: [],
-                rows: [],
-                summary: []
-            };
+        tableData.headers = [
+            {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
+            {key: 'sales-absolute', label: 'Sales', isSortable: true, defaultSort: true, defaultOrder: 'desc', isNumeric: true},
+            {key: 'sales-percent', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
+            {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
+            {key: 'avg-order', label: 'Average Order Value', isSortable: true, isNumeric: true},
+        ];
 
-            tableData.headers = [
-                {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
-                {key: 'sales-absolute', label: 'Sales', isSortable: true, defaultSort: true, defaultOrder: 'desc', isNumeric: true},
-                {key: 'sales-percent', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
-                {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
-                {key: 'avg-order', label: 'Average Order Value', isSortable: true, isNumeric: true},
-            ];
+        const reportFilters =
+            <ReportFilters
+            dateQuery={this.state.dateQuery}
+            query={this.props.query}
+            path={this.props.path}
+            onDateSelect={this.handleDateChange}/>;
 
-            data.countries.map(item => {
-                const row = [
-                    {
-                        display: item.country,
-                        value: item.country
-                    },
-                    {
-                        display: currency.render(item.stats.sales),
-                        value: item.stats.sales
-                    },
-                    {
-                        display: `${item.stats.sales_percentage}%`,
-                        value: item.stats.sales_percentage
-                    },
-                    {
-                        display: item.stats.orders,
-                        value: item.stats.orders
-                    },
-                    {
-                        display: currency.render(item.stats.average_order_value),
-                        value: item.stats.average_order_value
-                    },
-                ];
-                tableData.rows.push(row);
-            });
-
-            tableData.summary = [
-                {key: "sales", label: 'Sales in this period', value: currency.render(total_sales)},
-                {key: "orders", label: 'Orders in this period', value: orders},
-                {key: "countries", label: 'Countries in this period', value: countries},
-            ];
-
+        if (this.state.data.loading) {
             return <Fragment>
-                <ReportFilters
-                    dateQuery={dateQuery}
-                    query={this.props.query}
-                    path={this.props.path}
-                    onDateSelect={this.handleDateChange}
-                />
-                <SummaryList>
-                    {() => [
-                        <SummaryNumber key="sales" value={currency.render(total_sales)} label="Total Sales"/>,
-                        <SummaryNumber key="countries" value={countries} label="Countries"/>,
-                        <SummaryNumber key="orders" value={orders} label="Orders"/>
-                    ]}
-                </SummaryList>
-                <Chart chartType="bar" data={chartData} title="Sales by Country" layout="item-comparison"/>
-                <TableCard
-                    className="table_top_countries"
-                    title="Top Countries"
-                    rows={tableData.rows}
-                    headers={tableData.headers}
-                    query={{page: 2}}
-                    rowsPerPage={7}
-                    totalRows={10}
-                    summary={tableData.summary}
-                />
+                {reportFilters}
+                <SummaryListPlaceholder numberOfItems="3"/>
+                <ChartPlaceholder height="300px"/>
+                <TablePlaceholder caption="Top Countries" headers={tableData.headers}/>
             </Fragment>
+            }
+        else
+            {
+                const {data, currency} = this.state;
+                const {total_sales, orders, countries} = data.totals;
+
+                data.countries.map(item => {
+                    const row = [
+                        {
+                            display: item.country,
+                            value: item.country
+                        },
+                        {
+                            display: currency.render(item.stats.sales),
+                            value: item.stats.sales
+                        },
+                        {
+                            display: `${item.stats.sales_percentage}%`,
+                            value: item.stats.sales_percentage
+                        },
+                        {
+                            display: item.stats.orders,
+                            value: item.stats.orders
+                        },
+                        {
+                            display: currency.render(item.stats.average_order_value),
+                            value: item.stats.average_order_value
+                        },
+                    ];
+                    tableData.rows.push(row);
+                });
+
+                tableData.summary = [
+                    {key: "sales", label: 'Sales in this period', value: currency.render(total_sales)},
+                    {key: "orders", label: 'Orders in this period', value: orders},
+                    {key: "countries", label: 'Countries in this period', value: countries},
+                ];
+
+                return <Fragment>
+                    {reportFilters}
+                    <SummaryList>
+                        {() => [
+                            <SummaryNumber key="sales" value={currency.render(total_sales)} label="Total Sales"/>,
+                            <SummaryNumber key="countries" value={countries} label="Countries"/>,
+                            <SummaryNumber key="orders" value={orders} label="Orders"/>
+                        ]}
+                    </SummaryList>
+                    <Chart chartType="bar" data={chartData} title="Sales by Country" layout="item-comparison"/>
+                    <TableCard
+                        className="table_top_countries"
+                        title="Top Countries"
+                        rows={tableData.rows}
+                        headers={tableData.headers}
+                        query={{page: 2}}
+                        rowsPerPage={7}
+                        totalRows={10}
+                        summary={tableData.summary}
+                    />
+                </Fragment>
         }
     }
 }
