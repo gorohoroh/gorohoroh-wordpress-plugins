@@ -1,6 +1,6 @@
 import './SalesByCountryReport.scss';
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
-import {getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
+import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
 import {Chart, ReportFilters, SummaryList, SummaryNumber, TableCard} from "@woocommerce/components";
 import {chartData} from "./mockData";
@@ -13,10 +13,7 @@ export class SalesByCountryReport extends ReactComponent {
         super(props);
 
         const {path, query} = this.props;
-        const {period, compare, before, after} = getDateParamsFromQuery(query);
-        const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
-        const dateQuery = {period, compare, before, after, primaryDate, secondaryDate};
-
+        const dateQuery = this.createDateQuery(query);
         const storeCurrency = new Currency(storeCurrencySetting);
 
         this.state = {
@@ -25,28 +22,43 @@ export class SalesByCountryReport extends ReactComponent {
             currency: storeCurrency
         };
 
-        const defaultQueryParameters =
-            // this.addQueryParameter(dateQuery, "after") +
-            "&after=2020-03-01T00%3A00%3A00" +
-            // this.addQueryParameter(dateQuery,"before") +
-            "&before=2020-03-31T23%3A59%3A59" +
-            "&interval=day" +
-            "&order=asc" +
-            "&per_page=100" +
-            "&_locale=user";
+        this.handleDateChange = this.handleDateChange.bind(this);
+
+        this.fetchData(this.state.dateQuery);
+    }
+
+    createDateQuery(query) {
+        const {period, compare, before, after} = getDateParamsFromQuery(query);
+        const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
+        return {period, compare, before, after, primaryDate, secondaryDate};
+    }
+
+    getQueryParameters(dateQuery) {
+        const afterDate = encodeURIComponent(appendTimestamp(dateQuery.primaryDate.after, "start"));
+        const beforeDate = encodeURIComponent(appendTimestamp(dateQuery.primaryDate.before, "end"));
+        return `&after=${afterDate}&before=${beforeDate}&interval=day&order=asc&per_page=100&_locale=user`;
+    }
+
+    fetchData(dateQuery) {
 
         const endPoints = {
-            "countries": "/wc/v3/data/countries?_fields=code,name" + defaultQueryParameters,
-            "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales" + defaultQueryParameters,
-            "customers": "/wc-analytics/reports/customers?_fields=id,country" + defaultQueryParameters
+            "countries": "/wc/v3/data/countries?_fields=code,name",
+            "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales",
+            "customers": "/wc-analytics/reports/customers?_fields=id,country"
         };
 
+        const queryParameters = this.getQueryParameters(dateQuery);
+        const countriesPath = endPoints.countries + queryParameters;
+        const ordersPath = endPoints.orders + queryParameters;
+        const customersPath = endPoints.customers + queryParameters;
+
         Promise.all([
-            apiFetch({path: endPoints.countries}),
-            apiFetch({path: endPoints.orders}),
-            apiFetch({path: endPoints.customers})
+            apiFetch({path: countriesPath}),
+            apiFetch({path: ordersPath}),
+            apiFetch({path: customersPath})
         ])
             .then(([countries, orders, customers]) => {
+                // TODO Handle empty JSON returns (no data for a selected period). Right now they lead to errors from "reduce()" and indefinite "Waiting for data"
                 const data = this.prepareData(countries, orders, customers);
                 this.setState({data: data})
             })
@@ -118,9 +130,10 @@ export class SalesByCountryReport extends ReactComponent {
         return Math.round(propertyTotal * 100) / 100;
     }
 
-    addQueryParameter(dateQuery, parameterName) {
-        const parameterInDateQuery = dateQuery[parameterName];
-        return parameterInDateQuery ? `&${parameterName}=${parameterInDateQuery}` : '';
+    handleDateChange(newQuery) {
+        const newDateQuery = this.createDateQuery(newQuery);
+        // TODO compare date ranges in old and new queries; don't fetch if they're equal, or a date range in the new query is within the date range in the old query
+        this.fetchData(newDateQuery);
     }
 
     render() {
@@ -128,7 +141,7 @@ export class SalesByCountryReport extends ReactComponent {
             return <p>Waiting for data...</p>
         } else {
 
-            const {data, currency} = this.state;
+            const {data, currency, dateQuery} = this.state;
             const {total_sales, orders, countries} = data.totals;
 
             const tableData = {
@@ -179,12 +192,10 @@ export class SalesByCountryReport extends ReactComponent {
 
             return <Fragment>
                 <ReportFilters
-                    dateQuery={this.state.dateQuery}
+                    dateQuery={dateQuery}
                     query={this.props.query}
                     path={this.props.path}
-                    // report="revenue"
-                    // filters={filters}
-                    // advancedFilters={advancedFilters}
+                    onDateSelect={this.handleDateChange}
                 />
                 <SummaryList>
                     {() => [
