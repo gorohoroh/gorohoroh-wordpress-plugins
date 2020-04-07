@@ -41,6 +41,8 @@ export class SalesByCountryReport extends ReactComponent {
 
     fetchData(dateQuery) {
 
+        this.setState({loading: true});
+
         const endPoints = {
             "countries": "/wc/v3/data/countries?_fields=code,name",
             "orders": "/wc-analytics/reports/orders?_fields=order_id,date_created,date_created_gmt,customer_id,total_sales",
@@ -60,7 +62,7 @@ export class SalesByCountryReport extends ReactComponent {
             .then(([countries, orders, customers]) => {
                 // TODO Handle empty JSON returns (no data for a selected period). Right now they lead to errors from "reduce()" and indefinite "Waiting for data"
                 const data = this.prepareData(countries, orders, customers);
-                this.setState({data: data})
+                this.setState({data: data, loading: false})
             })
             .catch(err => console.log(err));
 
@@ -138,7 +140,7 @@ export class SalesByCountryReport extends ReactComponent {
     }
 
     render() {
-        if (!this.state.data) {
+        if (this.state.loading) {
             return <p>Waiting for data...</p>
         } else {
 
