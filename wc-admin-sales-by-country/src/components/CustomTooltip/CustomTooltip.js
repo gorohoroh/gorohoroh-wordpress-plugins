@@ -10,7 +10,7 @@ export class CustomTooltip extends ReactComponent {
                             <span className="key-color" style={{backgroundColor: "#096484"}}/>
                             <span className="key-key">{this.props.label}</span>
                         </div>
-                        <span className="key-value">{this.props.payload[0].value}</span>
+                        <span className="key-value">{this.props.currency.render(this.props.payload[0].value)}</span>
                     </li>
                 </ul>
             </div>

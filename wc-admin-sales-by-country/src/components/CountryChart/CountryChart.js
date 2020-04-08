@@ -28,7 +28,7 @@ export class CountryChart extends ReactComponent {
                                 <Tooltip
                                     cursor={{fill: "rgba(0, 0, 0, 0.1)"}}
                                     content={({active, payload, label}) => {
-                                        return !active ? null : (<CustomTooltip payload={payload} label={label} dateRange={this.props.dateRange}/>);
+                                        return !active ? null : (<CustomTooltip payload={payload} label={label} dateRange={this.props.dateRange} currency={this.props.currency}/>);
                                     }}/>
                             </BarChart>
                         </ResponsiveContainer>

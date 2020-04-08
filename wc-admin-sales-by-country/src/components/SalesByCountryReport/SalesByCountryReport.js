@@ -219,7 +219,7 @@ export class SalesByCountryReport extends ReactComponent {
                             <SummaryNumber key="orders" value={orders} label="Orders"/>
                         ]}
                     </SummaryList>
-                    <CountryChart chartData={data.countries} dateRange={dateQuery.primaryDate.range}/>
+                    <CountryChart chartData={data.countries} dateRange={dateQuery.primaryDate.range} currency={currency}/>
                     <TableCard
                         className="table_top_countries"
                         title="Top Countries"
