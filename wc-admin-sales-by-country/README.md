@@ -22,7 +22,11 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * :white_check_mark: Introduce currency formatting.
 * Create a dashboard widget (country leaderboard - similar to the main report's `TableCard` content).
 * Consider dropping the `/countries/` endpoint, and replacing it with a backend filter on the `/customers/` (or `/orders/`?) endpoint.
+* Fetch data using [`wp.data`](https://developer.wordpress.org/block-editor/packages/packages-data/).
+* Add doc comments to functions.
+* Review to follow WordPress coding standards.
 * Internationalize.
 * Refactor for readability.
 * Cover with tests.
+* Extend this README with install/activate/build instructions.
 * Write a guide to document how you got there.
