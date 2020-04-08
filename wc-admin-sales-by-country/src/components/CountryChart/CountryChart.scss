@@ -1,0 +1,78 @@
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$studio-white: #fff; // From @automattic/color-studio/dist/color-variables.scss
+$core-grey-light-700: #ccd0d4; // From woocommerce/packages/woocommerce-blocks/assets/css/abstracts/_colors.scss
+$gap-large: 24px; // From woocommerce/packages/woocommerce-blocks/assets/css/abstracts/_variables.scss
+$gap: 16px; // From woocommerce/packages/woocommerce-blocks/assets/css/abstracts/_variables.scss
+$wp-admin-sidebar: #24292d; // From woocommerce/packages/woocommerce-blocks/assets/css/abstracts/_variables.scss
+
+/* Tuning Recharts */
+
+.recharts-yAxis.yAxis line {
+  stroke: transparent;
+}
+
+.recharts-yAxis .recharts-cartesian-axis-tick-line {
+  visibility: hidden;
+}
+
+.recharts-tooltip-wrapper .d3-chart__tooltip {
+  visibility: visible !important;
+  left: $gap-large;
+  top: $gap-large;
+}
+
+.recharts-cartesian-axis text tspan
+{
+  font-family: $font-family;
+  font-size: 10px;
+}
+
+.recharts-cartesian-grid-horizontal line {
+  stroke: #e2e4e7;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+/* Shameless selective copy-paste from packages/components/src/chart/style.scss follows.
+TODO: Try actually reusing styles the original styles (.woocommerce-{name} instead of .countrychart-{name}) */
+
+.countrychart-chart {
+  margin-top: -$gap;
+  margin-bottom: $gap-large;
+  background: $studio-white;
+  border: 1px solid $core-grey-light-700;
+  border-top: 0;
+
+  .countrychart-chart__header {
+    min-height: 50px;
+    border-bottom: 1px solid $core-grey-light-700;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .countrychart-chart__title {
+      height: 18px;
+      color: $wp-admin-sidebar;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 18px;
+      margin-left: $gap;
+      margin-right: $gap;
+    }
+  }
+
+  .countrychart-chart__body {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+
+    &.countrychart-chart__body-column {
+      flex-direction: column;
+      margin-top: $gap;
+    }
+  }
+}

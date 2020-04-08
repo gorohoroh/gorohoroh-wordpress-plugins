@@ -3,7 +3,6 @@ import {Component as ReactComponent, Fragment} from "@wordpress/element";
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
 import {Chart, ChartPlaceholder, ReportFilters, SummaryList, SummaryListPlaceholder, SummaryNumber, TableCard, TablePlaceholder} from "@woocommerce/components";
-import {chartData as mockChartData} from "./mockData";
 import {default as Currency} from "@woocommerce/currency";
 import {CURRENCY as storeCurrencySetting} from "@woocommerce/settings";
 import {CountryChart} from "../CountryChart/CountryChart";
@@ -176,7 +175,7 @@ export class SalesByCountryReport extends ReactComponent {
             }
         else
             {
-                const {data, currency} = this.state;
+                const {data, currency, dateQuery} = this.state;
                 const {total_sales, orders, countries} = data.totals;
 
                 data.countries.map(item => {
@@ -220,8 +219,7 @@ export class SalesByCountryReport extends ReactComponent {
                             <SummaryNumber key="orders" value={orders} label="Orders"/>
                         ]}
                     </SummaryList>
-                    <Chart chartType="bar" data={mockChartData} title="Sales by Country" layout="item-comparison"/>
-                    <CountryChart chartData={data.countries}/>
+                    <CountryChart chartData={data.countries} dateRange={dateQuery.primaryDate.range}/>
                     <TableCard
                         className="table_top_countries"
                         title="Top Countries"

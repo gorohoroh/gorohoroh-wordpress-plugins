@@ -12,12 +12,13 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * :white_check_mark: Ensure component waits until data is ready before rendering.
 * :white_check_mark: Replace dummy data with live data in summary view (`SummaryList`).    
 * :white_check_mark: Replace dummy data with live data in per-country table view (`TableCard`).
-* Integrate a different chart control to plot per-country data.
+* :white_check_mark: Integrate a different chart control to plot per-country data.
 * :white_check_mark: Properly handle date ranges instead of hardcoding.
 * :white_check_mark: Add placeholder components to display while data is loading - instead of the current stub. 
 * Implement pagination in `TableCard`.
 * Implement sorting in `TableCard`.
 * Ensure proper rounding for numerical data.
+* Support previous periods.
 * :white_check_mark: Introduce currency formatting.
 * Create a dashboard widget (country leaderboard - similar to the main report's `TableCard` content).
 * Consider dropping the `/countries/` endpoint, and replacing it with a backend filter on the `/customers/` (or `/orders/`?) endpoint.
