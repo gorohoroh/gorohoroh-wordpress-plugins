@@ -1,3 +1,4 @@
+import "./CountryTable.scss"
 import {Component as ReactComponent} from "@wordpress/element";
 import {TableCard} from "@woocommerce/components";
 

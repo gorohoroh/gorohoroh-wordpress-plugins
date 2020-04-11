@@ -1,4 +1,3 @@
-import './SalesByCountryReport.scss';
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
