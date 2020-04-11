@@ -2,10 +2,11 @@ import './SalesByCountryReport.scss';
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
-import {Chart, ChartPlaceholder, ReportFilters, SummaryList, SummaryListPlaceholder, SummaryNumber, TableCard, TablePlaceholder} from "@woocommerce/components";
+import {ChartPlaceholder, ReportFilters, SummaryList, SummaryListPlaceholder, SummaryNumber, TablePlaceholder} from "@woocommerce/components";
 import {default as Currency} from "@woocommerce/currency";
 import {CURRENCY as storeCurrencySetting} from "@woocommerce/settings";
 import {CountryChart} from "../CountryChart/CountryChart";
+import {CountryTable} from "../CountryTable/CountryTable"
 
 export class SalesByCountryReport extends ReactComponent {
 
@@ -144,20 +145,6 @@ export class SalesByCountryReport extends ReactComponent {
 
     render() {
 
-        const tableData = {
-            headers: [],
-            rows: [],
-            summary: []
-        };
-
-        tableData.headers = [
-            {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
-            {key: 'sales-absolute', label: 'Sales', isSortable: true, defaultSort: true, defaultOrder: 'desc', isNumeric: true},
-            {key: 'sales-percent', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
-            {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
-            {key: 'avg-order', label: 'Average Order Value', isSortable: true, isNumeric: true},
-        ];
-
         const reportFilters =
             <ReportFilters
             dateQuery={this.state.dateQuery}
@@ -170,66 +157,31 @@ export class SalesByCountryReport extends ReactComponent {
                 {reportFilters}
                 <SummaryListPlaceholder numberOfItems="3"/>
                 <ChartPlaceholder height="300px"/>
-                <TablePlaceholder caption="Top Countries" headers={tableData.headers}/>
+                <TablePlaceholder caption="Top Countries" headers={[
+                    {key: 'country', label: 'Country'},
+                    {key: 'sales-absolute', label: 'Sales'},
+                    {key: 'sales-percent', label: 'Sales (percentage)'},
+                    {key: 'orders', label: 'Number of Orders'},
+                    {key: 'avg-order', label: 'Average Order Value'},
+                ]}/>
+                {/* TODO Reuse headers between placeholder and table */}
             </Fragment>
             }
         else
             {
                 const {data, currency, dateQuery} = this.state;
-                const {total_sales, orders, countries} = data.totals;
-
-                data.countries.map(item => {
-                    const row = [
-                        {
-                            display: item.country,
-                            value: item.country
-                        },
-                        {
-                            display: currency.render(item.stats.sales),
-                            value: item.stats.sales
-                        },
-                        {
-                            display: `${item.stats.sales_percentage}%`,
-                            value: item.stats.sales_percentage
-                        },
-                        {
-                            display: item.stats.orders,
-                            value: item.stats.orders
-                        },
-                        {
-                            display: currency.render(item.stats.average_order_value),
-                            value: item.stats.average_order_value
-                        },
-                    ];
-                    tableData.rows.push(row);
-                });
-
-                tableData.summary = [
-                    {key: "sales", label: 'Sales in this period', value: currency.render(total_sales)},
-                    {key: "orders", label: 'Orders in this period', value: orders},
-                    {key: "countries", label: 'Countries in this period', value: countries},
-                ];
 
                 return <Fragment>
                     {reportFilters}
                     <SummaryList>
                         {() => [
-                            <SummaryNumber key="sales" value={currency.render(total_sales)} label="Total Sales"/>,
-                            <SummaryNumber key="countries" value={countries} label="Countries"/>,
-                            <SummaryNumber key="orders" value={orders} label="Orders"/>
+                            <SummaryNumber key="sales" value={currency.render(data.totals.total_sales)} label="Total Sales"/>,
+                            <SummaryNumber key="countries" value={data.totals.countries} label="Countries"/>,
+                            <SummaryNumber key="orders" value={data.totals.orders} label="Orders"/>
                         ]}
                     </SummaryList>
                     <CountryChart chartData={data.countries} dateRange={dateQuery.primaryDate.range} currency={currency}/>
-                    <TableCard
-                        className="table_top_countries"
-                        title="Top Countries"
-                        rows={tableData.rows}
-                        headers={tableData.headers}
-                        query={{page: 2}}
-                        rowsPerPage={7}
-                        totalRows={10}
-                        summary={tableData.summary}
-                    />
+                    <CountryTable countryData={data.countries} totals={data.totals} currency={currency}/>
                 </Fragment>
         }
     }
