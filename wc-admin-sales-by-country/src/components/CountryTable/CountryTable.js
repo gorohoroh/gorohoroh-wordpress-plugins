@@ -9,6 +9,7 @@ export class CountryTable extends ReactComponent {
         this.handleSort = this.handleSort.bind(this);
 
         const defaultSortColumn = "sales";
+        const defaultSortOrder = "desc";
 
         const flatData = this.props.countryData.map(country => ({
             country: country.country,
@@ -18,34 +19,48 @@ export class CountryTable extends ReactComponent {
             average_order_value: country.stats.average_order_value
         }));
 
-        const sortedCountryData = this.sort(flatData, defaultSortColumn).reverse();
+        const countryDataSortedByDefault = this.sort(flatData, defaultSortColumn, defaultSortOrder);
 
         this.state = {
-            countryData: sortedCountryData,
-            sortColumn: defaultSortColumn
+            countryData: countryDataSortedByDefault,
+            sortColumn: defaultSortColumn,
+            sortOrder: defaultSortOrder
         }
     }
 
-    sort(data, column) {
+    applySortOrder(order) {
+        return order === "asc" ? 1 : -1;
+    }
+
+    changeSortOrder(order) {
+        return order === "asc" ? "desc" : "asc";
+    }
+
+    sort(data, column, sortOrder) {
+        const appliedSortOrder = this.applySortOrder(sortOrder);
         return data.sort((a, b) => {
-            if (a[column] > b[column]) return 1;
-            if (a[column] < b[column]) return -1;
+            if (a[column] > b[column]) return appliedSortOrder;
+            if (a[column] < b[column]) return -1 * appliedSortOrder;
             return 0;
         });
     }
 
     handleSort(newSortColumn) {
-        let {countryData, sortColumn} = this.state;
+        let {countryData, sortColumn, sortOrder} = this.state;
 
-        if (sortColumn === newSortColumn) countryData.reverse();
+        if (sortColumn === newSortColumn) {
+            countryData.reverse();
+            sortOrder = this.changeSortOrder(sortOrder);
+        }
         else {
             sortColumn = newSortColumn;
-            countryData = this.sort(countryData, sortColumn);
+            countryData = this.sort(countryData, sortColumn, sortOrder);
         }
 
         this.setState({
             countryData: countryData,
-            sortColumn: sortColumn
+            sortColumn: sortColumn,
+            sortOrder: sortOrder
         });
     }
 
@@ -62,7 +77,7 @@ export class CountryTable extends ReactComponent {
 
         tableData.headers = [
             {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
-            {key: 'sales', label: 'Sales', isSortable: true, defaultOrder: 'desc', isNumeric: true},
+            {key: 'sales', label: 'Sales', isSortable: true, isNumeric: true},
             {key: 'sales_percentage', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
             {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
             {key: 'average_order_value', label: 'Average Order Value', isSortable: true, isNumeric: true},
@@ -71,6 +86,7 @@ export class CountryTable extends ReactComponent {
         tableData.headers.map(header => {
             if (header.key === this.state.sortColumn) {
                 header.defaultSort = true;
+                header.defaultOrder = this.state.sortOrder;
             }
         });
 

@@ -16,7 +16,7 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * :white_check_mark: Properly handle date ranges instead of hardcoding.
 * :white_check_mark: Add placeholder components to display while data is loading - instead of the current stub. 
 * Implement pagination in `TableCard`.
-* Implement sorting in `TableCard`.
+* :white_check_mark: Implement sorting in `TableCard`.
 * Ensure proper rounding for numerical data.
 * Support previous periods.
 * :white_check_mark: Introduce currency formatting.
