@@ -158,11 +158,11 @@ export class SalesByCountryReport extends ReactComponent {
                 <SummaryListPlaceholder numberOfItems="3"/>
                 <ChartPlaceholder height="300px"/>
                 <TablePlaceholder caption="Top Countries" headers={[
-                    {key: 'country', label: 'Country'},
-                    {key: 'sales-absolute', label: 'Sales'},
-                    {key: 'sales-percent', label: 'Sales (percentage)'},
-                    {key: 'orders', label: 'Number of Orders'},
-                    {key: 'avg-order', label: 'Average Order Value'},
+                    {key: "country", label: "Country"},
+                    {key: "sales", label: "Sales"},
+                    {key: "sales_percentage", label: "Sales (percentage)"},
+                    {key: "orders", label: "Number of Orders"},
+                    {key: "average_order_value", label: "Average Order Value"},
                 ]}/>
                 {/* TODO Reuse headers between placeholder and table */}
             </Fragment>
