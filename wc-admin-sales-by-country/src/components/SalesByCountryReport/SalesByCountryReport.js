@@ -154,8 +154,8 @@ export class SalesByCountryReport extends ReactComponent {
         if (this.state.data.loading) {
             return <Fragment>
                 {reportFilters}
-                <SummaryListPlaceholder numberOfItems="3"/>
-                <ChartPlaceholder height="300px"/>
+                <SummaryListPlaceholder numberOfItems={3}/>
+                <ChartPlaceholder height={300}/>
                 <TablePlaceholder caption="Top Countries" headers={[
                     {key: "country", label: "Country"},
                     {key: "sales", label: "Sales"},
