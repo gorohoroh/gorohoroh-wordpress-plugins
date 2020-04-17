@@ -78,8 +78,8 @@ export class SalesByCountryReport extends ReactComponent {
         };
 
         data.countries = data.countries.map(country => {
-            country.stats.sales_percentage = Math.round(country.stats.sales / data.totals.total_sales * 10000) / 100;
-            country.stats.average_order_value = country.stats.sales / country.stats.orders;
+            country.sales_percentage = Math.round(country.sales / data.totals.total_sales * 10000) / 100;
+            country.average_order_value = country.sales / country.orders;
             return country;
         });
 
@@ -98,19 +98,17 @@ export class SalesByCountryReport extends ReactComponent {
                 const countryObjectTemplate = {
                     "country": currentObject['country'],
                     "country_code": countryCode,
-                    "stats": {
-                        "sales": 0,
-                        "sales_percentage": 0,
-                        "orders": 0,
-                        "average_order_value": 0
-                    }
+                    "sales": 0,
+                    "sales_percentage": 0,
+                    "orders": 0,
+                    "average_order_value": 0
                 };
                 accumulator.countries.push(countryObjectTemplate)
             }
 
             const countryIndexInAccumulator = accumulator.countries.findIndex(item => item.country_code === countryCode);
-            accumulator.countries[countryIndexInAccumulator].stats.sales += currentObject.total_sales;
-            accumulator.countries[countryIndexInAccumulator].stats.orders++;
+            accumulator.countries[countryIndexInAccumulator].sales += currentObject.total_sales;
+            accumulator.countries[countryIndexInAccumulator].orders++;
 
             return accumulator;
         }, {});
@@ -128,7 +126,7 @@ export class SalesByCountryReport extends ReactComponent {
     }
 
     getTotalNumber(data, property) {
-        const propertyTotal = data.reduce((accumulator, currentObject) => accumulator + currentObject.stats[property], 0);
+        const propertyTotal = data.reduce((accumulator, currentObject) => accumulator + currentObject[property], 0);
         return Math.round(propertyTotal * 100) / 100;
     }
 

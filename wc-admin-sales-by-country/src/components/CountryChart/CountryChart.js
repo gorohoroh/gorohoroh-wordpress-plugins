@@ -6,7 +6,7 @@ import {CustomTooltip} from "../CustomTooltip/CustomTooltip";
 export class CountryChart extends ReactComponent {
     render() {
         const chartData = this.props.chartData
-            .map(country => ({name: country.country, value: country.stats.sales}))
+            .map(country => ({name: country.country, value: country.sales}))
             .sort((a, b) => {
                 if (a.value > b.value) return -1;
                 if (a.value < b.value) return 1;

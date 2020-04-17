@@ -12,15 +12,7 @@ export class CountryTable extends ReactComponent {
         const defaultSortColumn = "sales";
         const defaultSortOrder = "desc";
 
-        const flatData = this.props.countryData.map(country => ({
-            country: country.country,
-            sales: country.stats.sales,
-            sales_percentage: country.stats.sales_percentage,
-            orders: country.stats.orders,
-            average_order_value: country.stats.average_order_value
-        }));
-
-        const countryDataSortedByDefault = this.sort(flatData, defaultSortColumn, defaultSortOrder);
+        const countryDataSortedByDefault = this.sort(this.props.countryData, defaultSortColumn, defaultSortOrder);
 
         this.state = {
             countryData: countryDataSortedByDefault,
