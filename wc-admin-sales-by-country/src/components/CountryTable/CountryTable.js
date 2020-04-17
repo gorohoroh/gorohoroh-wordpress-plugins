@@ -63,18 +63,10 @@ export class CountryTable extends ReactComponent {
         const currency = this.props.currency;
 
         const tableData = {
-            headers: [],
+            headers: this.props.headers,
             rows: [],
             summary: []
         };
-
-        tableData.headers = [
-            {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
-            {key: 'sales', label: 'Sales', isSortable: true, isNumeric: true},
-            {key: 'sales_percentage', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
-            {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
-            {key: 'average_order_value', label: 'Average Order Value', isSortable: true, isNumeric: true},
-        ];
 
         tableData.headers.map(header => {
             if (header.key === this.state.sortColumn) {

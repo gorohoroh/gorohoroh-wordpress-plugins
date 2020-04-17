@@ -156,18 +156,20 @@ export class SalesByCountryReport extends ReactComponent {
             path={this.props.path}
             onDateSelect={this.handleDateChange}/>;
 
+        const tableHeaders = [
+            {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
+            {key: 'sales', label: 'Sales', isSortable: true, isNumeric: true},
+            {key: 'sales_percentage', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
+            {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
+            {key: 'average_order_value', label: 'Average Order Value', isSortable: true, isNumeric: true},
+        ];
+
         if (this.state.data.loading) {
             return <Fragment>
                 {reportFilters}
                 <SummaryListPlaceholder numberOfItems={3}/>
                 <ChartPlaceholder height={300}/>
-                <TablePlaceholder caption="Top Countries" headers={[
-                    {key: "country", label: "Country"},
-                    {key: "sales", label: "Sales"},
-                    {key: "sales_percentage", label: "Sales (percentage)"},
-                    {key: "orders", label: "Number of Orders"},
-                    {key: "average_order_value", label: "Average Order Value"},
-                ]}/>
+                <TablePlaceholder caption="Top Countries" headers={tableHeaders}/>
             </Fragment>
             }
         else
@@ -184,7 +186,7 @@ export class SalesByCountryReport extends ReactComponent {
                         ]}
                     </SummaryList>
                     <CountryChart chartData={data.countries} dateRange={dateQuery.primaryDate.range} currency={currency}/>
-                    <CountryTable countryData={data.countries} totals={data.totals} currency={currency}/>
+                    <CountryTable countryData={data.countries} totals={data.totals} currency={currency} headers={tableHeaders}/>
                 </Fragment>
         }
     }
