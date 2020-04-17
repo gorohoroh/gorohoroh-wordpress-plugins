@@ -61,13 +61,10 @@ export class SalesByCountryReport extends ReactComponent {
             apiFetch({path: customersPath})
         ])
             .then(([countries, orders, customers]) => {
-                // TODO Handle empty JSON returns (no data for a selected period). Right now they lead to errors from "reduce()" and indefinite "Waiting for data"
                 const data = this.prepareData(countries, orders, customers);
                 this.setState({data: data})
             })
             .catch(err => console.log(err));
-
-        // TODO fetch only countries represented in the current date range's set of orders - see discussion at https://a8c.slack.com/archives/GTNUWF8MT/p1585756629003400
     }
 
     prepareData(countries, orders, customers) {
@@ -138,7 +135,6 @@ export class SalesByCountryReport extends ReactComponent {
     handleDateChange(newQuery) {
         const newDateQuery = this.createDateQuery(newQuery);
         this.setState({dateQuery: newDateQuery});
-        // TODO compare date ranges in old and new queries; don't fetch if they're equal, or a date range in the new query is within the date range in the old query
         this.fetchData(newDateQuery);
     }
 
@@ -163,7 +159,6 @@ export class SalesByCountryReport extends ReactComponent {
                     {key: "orders", label: "Number of Orders"},
                     {key: "average_order_value", label: "Average Order Value"},
                 ]}/>
-                {/* TODO Reuse headers between placeholder and table */}
             </Fragment>
             }
         else

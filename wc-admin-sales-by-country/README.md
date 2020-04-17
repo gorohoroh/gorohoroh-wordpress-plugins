@@ -17,12 +17,15 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * :white_check_mark: Add placeholder components to display while data is loading - instead of the current stub. 
 * Implement pagination in `TableCard`.
 * :white_check_mark: Implement sorting in `TableCard`.
-* Ensure proper rounding for numerical data.
+* :white_check_mark: Ensure proper rounding for numerical data.
+* `SalesByCountryReport.fetchData()`: handle empty JSON returns (no data for a selected period); right now they lead to errors from `reduce()` and indefinite "Waiting for data"
 * Support previous periods.
 * :white_check_mark: Introduce currency formatting.
-* Create a dashboard widget (country leaderboard - similar to the main report's `TableCard` content).
-* Consider dropping the `/countries/` endpoint, and replacing it with a backend filter on the `/customers/` (or `/orders/`?) endpoint.
+* Create a [dashboard widget](https://github.com/woocommerce/woocommerce-admin/tree/master/docs/examples/extensions/dashboard-section) (country leaderboard - similar to the main report's `TableCard` content).
 * Fetch data using [`wp.data`](https://developer.wordpress.org/block-editor/packages/packages-data/).
+* `SalesByCountryReport.handleDateChange()`: compare date ranges in old and new queries; don't fetch if they're equal, or if a date range in the new query is within the date range in the old query.
+* `SalesByCountryReport.fetchData()`: to fetch only countries represented in the current date range's set of orders, consider dropping the `/countries/` endpoint, and replacing it with a backend filter on the `/customers/` (and/or `/orders/`?) endpoint (see [discussion](https://a8c.slack.com/archives/GTNUWF8MT/p1585756629003400)).
+* `TablePlaceholder`, `CountryTable`: reuse headers?
 * Add doc comments to functions.
 * Review to follow WordPress coding standards.
 * Internationalize.
