@@ -18,7 +18,7 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * Implement pagination in `TableCard`.
 * :white_check_mark: Implement sorting in `TableCard`.
 * :white_check_mark: Ensure proper rounding for numerical data.
-* `SalesByCountryReport.fetchData()`: handle empty JSON returns (no data for a selected period); right now they lead to errors from `reduce()` and indefinite "Waiting for data"
+* :white_check_mark: Handle empty JSON returns (no data for a selected period) to prevent the indefinite "Waiting for data"
 * Support previous periods.
 * :white_check_mark: Flatten data object structure (get rid of the `stats` wrapper property)
 * :white_check_mark: Introduce currency formatting.
