@@ -1,4 +1,5 @@
 import "./CountryTable.scss"
+import {__} from "@wordpress/i18n";
 import {Component as ReactComponent} from "@wordpress/element";
 import {TableCard} from "@woocommerce/components";
 
@@ -102,14 +103,14 @@ export class CountryTable extends ReactComponent {
         });
 
         tableData.summary = [
-            {key: "sales", label: 'Sales in this period', value: currency.render(totals.total_sales)},
-            {key: "orders", label: 'Orders in this period', value: totals.orders},
-            {key: "countries", label: 'Countries in this period', value: totals.countries},
+            {key: "sales", label: __("Sales in this period", "wc-admin-sales-by-country"), value: currency.render(totals.total_sales)},
+            {key: "orders", label: __("Orders in this period", "wc-admin-sales-by-country"), value: totals.orders},
+            {key: "countries", label: __("Countries in this period", "wc-admin-sales-by-country"), value: totals.countries},
         ];
 
         return <TableCard
             className="table_top_countries"
-            title="Top Countries"
+            title={__("Top Countries", "wc-admin-sales-by-country")}
             rows={tableData.rows}
             headers={tableData.headers}
             query={{page: 2}}

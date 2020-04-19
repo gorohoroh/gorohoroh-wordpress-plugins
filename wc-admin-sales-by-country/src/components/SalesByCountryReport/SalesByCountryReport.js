@@ -1,4 +1,5 @@
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
+import {__} from "@wordpress/i18n";
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
 import {ChartPlaceholder, ReportFilters, SummaryList, SummaryListPlaceholder, SummaryNumber, TablePlaceholder} from "@woocommerce/components";
@@ -130,7 +131,7 @@ export class SalesByCountryReport extends ReactComponent {
             order.country_code = customers.find(item => item.id === order.customer_id).country;
 
             const country = countries.find(item => item.code === order.country_code);
-            order.country = country ? country.name : "Unknown country";
+            order.country = country ? country.name : __("Unknown country", "wc-admin-sales-by-country");
 
             return order;
         });
@@ -157,11 +158,11 @@ export class SalesByCountryReport extends ReactComponent {
             onDateSelect={this.handleDateChange}/>;
 
         const tableHeaders = [
-            {key: 'country', label: 'Country', isLeftAligned: true, isSortable: true, required: true},
-            {key: 'sales', label: 'Sales', isSortable: true, isNumeric: true},
-            {key: 'sales_percentage', label: 'Sales (percentage)', isSortable: true, isNumeric: true},
-            {key: 'orders', label: 'Number of Orders', isSortable: true, isNumeric: true},
-            {key: 'average_order_value', label: 'Average Order Value', isSortable: true, isNumeric: true},
+            {key: 'country', label: __("Country", "wc-admin-sales-by-country"), isLeftAligned: true, isSortable: true, required: true},
+            {key: "sales", label: __("Sales", "wc-admin-sales-by-country"), isSortable: true, isNumeric: true},
+            {key: "sales_percentage", label: __("Sales (percentage)", "wc-admin-sales-by-country"), isSortable: true, isNumeric: true},
+            {key: "orders", label: __("Number of Orders", "wc-admin-sales-by-country"), isSortable: true, isNumeric: true},
+            {key: "average_order_value", label: __("Average Order Value", "wc-admin-sales-by-country"), isSortable: true, isNumeric: true},
         ];
 
         if (this.state.data.loading) {
@@ -169,25 +170,35 @@ export class SalesByCountryReport extends ReactComponent {
                 {reportFilters}
                 <SummaryListPlaceholder numberOfItems={3}/>
                 <ChartPlaceholder height={300}/>
-                <TablePlaceholder caption="Top Countries" headers={tableHeaders}/>
+                <TablePlaceholder caption={__("Top Countries", "wc-admin-sales-by-country")}
+                                  headers={tableHeaders}/>
             </Fragment>
-            }
-        else
-            {
-                const {data, currency, dateQuery} = this.state;
+        } else {
+            const {data, currency, dateQuery} = this.state;
 
-                return <Fragment>
-                    {reportFilters}
-                    <SummaryList>
-                        {() => [
-                            <SummaryNumber key="sales" value={currency.render(data.totals.total_sales)} label="Total Sales"/>,
-                            <SummaryNumber key="countries" value={data.totals.countries} label="Countries"/>,
-                            <SummaryNumber key="orders" value={data.totals.orders} label="Orders"/>
-                        ]}
-                    </SummaryList>
-                    <CountryChart chartData={data.countries} dateRange={dateQuery.primaryDate.range} currency={currency}/>
-                    <CountryTable countryData={data.countries} totals={data.totals} currency={currency} headers={tableHeaders}/>
-                </Fragment>
+            return <Fragment>
+                {reportFilters}
+                <SummaryList>
+                    {() => [
+                        <SummaryNumber key="sales"
+                                       value={currency.render(data.totals.total_sales)}
+                                       label={__("Total Sales", "wc-admin-sales-by-country")}/>,
+                        <SummaryNumber key="countries"
+                                       value={data.totals.countries}
+                                       label={__("Countries", "wc-admin-sales-by-country")}/>,
+                        <SummaryNumber key="orders"
+                                       value={data.totals.orders}
+                                       label={__("Orders", "wc-admin-sales-by-country")}/>
+                    ]}
+                </SummaryList>
+                <CountryChart chartData={data.countries}
+                              dateRange={dateQuery.primaryDate.range}
+                              currency={currency}/>
+                <CountryTable countryData={data.countries}
+                              totals={data.totals}
+                              currency={currency}
+                              headers={tableHeaders}/>
+            </Fragment>
         }
     }
 }

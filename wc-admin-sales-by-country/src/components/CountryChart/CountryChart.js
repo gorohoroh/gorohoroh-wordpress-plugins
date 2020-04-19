@@ -1,4 +1,5 @@
 import "./CountryChart.scss"
+import {__} from "@wordpress/i18n";
 import {Component as ReactComponent} from "@wordpress/element";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {CustomTooltip} from "../CustomTooltip/CustomTooltip";
@@ -36,7 +37,7 @@ export class CountryChart extends ReactComponent {
                                                                     currency={this.props.currency}/>);
                                             }}/>
                                     </BarChart>)
-                                : <div className="d3-chart__empty-message">No data for the selected date range</div>
+                                : <div className="d3-chart__empty-message">{__("No data for the selected date range", "wc-admin-sales-by-country")}</div>
                             }
                     </ResponsiveContainer>
                     </div>
