@@ -21,6 +21,7 @@ export class SalesByCountryReport extends ReactComponent {
             dateQuery: dateQuery,
             path: path,
             currency: storeCurrency,
+            allCountries: [],
             data: { loading: true }
         };
 
@@ -52,18 +53,18 @@ export class SalesByCountryReport extends ReactComponent {
         };
 
         const queryParameters = this.getQueryParameters(dateQuery);
-        const countriesPath = endPoints.countries + queryParameters;
+        const countriesPath = endPoints.countries;
         const ordersPath = endPoints.orders + queryParameters;
         const customersPath = endPoints.customers + queryParameters;
 
         Promise.all([
-            apiFetch({path: countriesPath}),
+            this.state.allCountries.length === 0 ? apiFetch({path: countriesPath}) : Promise.resolve(this.state.allCountries),
             apiFetch({path: ordersPath}),
             apiFetch({path: customersPath})
         ])
             .then(([countries, orders, customers]) => {
                 const data = this.prepareData(countries, orders, customers);
-                this.setState({data: data})
+                this.setState({data: data, allCountries: countries})
             })
             .catch(err => console.log(err));
     }

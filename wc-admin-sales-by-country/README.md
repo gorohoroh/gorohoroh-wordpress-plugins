@@ -25,7 +25,7 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * Create a [dashboard widget](https://github.com/woocommerce/woocommerce-admin/tree/master/docs/examples/extensions/dashboard-section) (country leaderboard - similar to the main report's `TableCard` content).
 * Fetch data using [`wp.data`](https://developer.wordpress.org/block-editor/packages/packages-data/).
 * `SalesByCountryReport.handleDateChange()`: compare date ranges in old and new queries; don't fetch if they're equal, or if a date range in the new query is within the date range in the old query.
-* `SalesByCountryReport.fetchData()`: to fetch only countries represented in the current date range's set of orders, consider dropping the `/countries/` endpoint, and replacing it with a backend filter on the `/customers/` (and/or `/orders/`?) endpoint (see [discussion](https://a8c.slack.com/archives/GTNUWF8MT/p1585756629003400)).
+* :white_check_mark: `SalesByCountryReport.fetchData()`: fetch all countries once, add them to state, then read from the state instead of fetching again.
 * :white_check_mark: `TablePlaceholder`, `CountryTable`: reuse headers
 * Add doc comments to functions.
 * Review to follow WordPress coding standards.
