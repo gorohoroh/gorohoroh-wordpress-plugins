@@ -70,14 +70,7 @@ export class SalesByCountryReport extends ReactComponent {
     }
 
     prepareData(countries, orders, customers) {
-        let data =  {
-                countries: [],
-                totals: {
-                    total_sales: 0,
-                    orders: 0,
-                    countries: 0
-                }
-            };
+        let data;
 
         if (orders.length > 0) {
             const ordersWithCountries = this.getOrdersWithCountries(orders, customers, countries);
@@ -94,6 +87,15 @@ export class SalesByCountryReport extends ReactComponent {
                 country.average_order_value = country.sales / country.orders;
                 return country;
             });
+        } else {
+            data = {
+                countries: [],
+                totals: {
+                    total_sales: 0,
+                    orders: 0,
+                    countries: 0
+                }
+            }
         }
 
         data.loading = false;
