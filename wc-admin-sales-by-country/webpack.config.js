@@ -1,6 +1,7 @@
 const defaultConfig = require( "@wordpress/scripts/config/webpack.config" );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
+const exec = require('child_process').exec;
 
 const requestToExternal = request => {
 	const wcDepMap = {
@@ -48,6 +49,16 @@ module.exports = {
 		new MiniCssExtractPlugin( {
 			filename: 'style.css',
 		} ),
+		{
+			apply: (compiler) => {
+				compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
+					exec('wp i18n make-pot src languages/wc-admin-sales-by-country.pot --domain=wc-admin-sales-by-country', (err, stdout, stderr) => {
+						if (stdout) process.stdout.write(stdout);
+						if (stderr) process.stderr.write(stderr);
+					});
+				});
+			}
+		}
 	],
 	module: {
 		...defaultConfig.module,

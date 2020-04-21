@@ -29,7 +29,7 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * :white_check_mark: `TablePlaceholder`, `CountryTable`: reuse headers
 * Add doc comments to functions.
 * Review to follow WordPress coding standards.
-* Internationalize.
+* :white_check_mark: Internationalize.
 * Refactor for readability.
 * Cover with tests.
 * Extend this README with install/activate/build instructions.
