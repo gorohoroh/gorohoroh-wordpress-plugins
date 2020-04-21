@@ -113,9 +113,9 @@ export class CountryTable extends ReactComponent {
             title={__("Top Countries", "wc-admin-sales-by-country")}
             rows={tableData.rows}
             headers={tableData.headers}
-            query={{page: 2}}
-            rowsPerPage={7}
-            totalRows={10}
+            query={{page: 1}}
+            rowsPerPage={100}
+            totalRows={tableData.rows.length}
             summary={tableData.summary}
             onSort={this.handleSort}
         />
