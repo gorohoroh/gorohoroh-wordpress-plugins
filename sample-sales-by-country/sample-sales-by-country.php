@@ -42,3 +42,16 @@ function add_sample_sales_by_country_register_script() {
 }
 
 add_action( 'admin_enqueue_scripts', 'add_sample_sales_by_country_register_script' );
+
+add_filter('woocommerce_analytics_report_menu_items', 'add_sample_sales_by_country_to_analytics_menu');
+
+function add_sample_sales_by_country_to_analytics_menu($report_pages) {
+    $report_pages[] = array(
+        'id' => 'sample-sales-by-country',
+        'title' => __('Sales by Country', 'sample-sales-by-country'),
+        'parent' => 'woocommerce-analytics',
+        'path' => '/analytics/sample-sales-by-country',
+    );
+
+    return $report_pages;
+}
