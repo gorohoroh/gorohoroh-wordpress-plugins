@@ -45,7 +45,7 @@ function add_to_analytics_menu($report_pages) {
 
     $report_pages[] = array(
         'id' => 'wc-admin-sales-by-country',
-        'title' => 'Sales by Country',
+        'title' => __('Sales by Country', 'wc-admin-sales-by-country'),
         'parent' => 'woocommerce-analytics',
         'path' => '/analytics/sales-by-country',
     );
