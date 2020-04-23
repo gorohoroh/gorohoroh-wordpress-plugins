@@ -1,9 +1,37 @@
 {
   "name": "wc-admin-sales-by-country",
   "title": "wc-admin-sales-by-country",
-  "license": "GPL-3.0-or-later",
   "version": "0.1.0",
   "description": "wc-admin-sales-by-country",
+  "author": {
+    "name": "Jura Gorohovsky",
+    "email": "gorohoroh@gmail.com"
+  },
+  "license": "GPL-3.0-or-later",
+  "keywords": [ "woocommerce", "wordpress", "gutenberg", "javascript", "react", "plugin", "ecommerce" ],
+  "homepage": "https://github.com/gorohoroh/gorohoroh-wordpress-plugins/tree/master/wc-admin-sales-by-country",
+  "repository": {
+    "url": "https://github.com/gorohoroh/gorohoroh-wordpress-plugins/tree/master/wc-admin-sales-by-country"
+  },
+  "bugs": {
+    "url": "https://github.com/gorohoroh/gorohoroh-wordpress-plugins/issues"
+  },
+  "dependencies": {
+    "@woocommerce/components": "^4.0.0",
+    "@woocommerce/date": "^2.0.0",
+    "@woocommerce/settings": "^1.0.0",
+    "@wordpress/api-fetch": "^3.11.0",
+    "@wordpress/hooks": "^2.7.0",
+    "@wordpress/i18n": "^3.9.0",
+    "recharts": "^1.8.5"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^6.0.0",
+    "css-loader": "3.3.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "node-sass": "4.13.0",
+    "sass-loader": "7.3.1"
+  },
   "scripts": {
     "build": "wp-scripts build",
     "check-engines": "wp-scripts check-engines",
@@ -14,21 +42,5 @@
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js"
-  },
-  "devDependencies": {
-    "@wordpress/scripts": "^6.0.0",
-    "mini-css-extract-plugin": "^0.8.0",
-    "sass-loader": "7.3.1",
-    "css-loader": "3.3.0",
-    "node-sass": "4.13.0"
-  },
-  "dependencies": {
-    "@woocommerce/components": "^4.0.0",
-    "@woocommerce/date": "^2.0.0",
-    "@wordpress/hooks": "^2.7.0",
-    "@wordpress/i18n": "^3.9.0",
-    "@wordpress/api-fetch": "^3.11.0",
-    "@woocommerce/settings": "^1.0.0",
-    "recharts": "^1.8.5"
   }
 }
