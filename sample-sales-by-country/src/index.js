@@ -1,10 +1,7 @@
 import {addFilter} from '@wordpress/hooks';
 import {__} from '@wordpress/i18n';
-import {Component as ReactComponent} from '@wordpress/element';
+import {SalesByCountryReport} from "./components/SalesByCountryReport/SalesByCountryReport";
 
-class SalesByCountryReport extends ReactComponent {
-    render() { return null }
-}
 
 addFilter('woocommerce_admin_reports_list', 'sample-sales-by-country', (reports) => {
     return [
