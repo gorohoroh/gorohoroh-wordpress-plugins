@@ -10,7 +10,7 @@ addFilter('woocommerce_admin_reports_list', 'sample-sales-by-country', (reports)
     return [
         ...reports,
         {
-            report: 'sales-by-country',
+            report: 'sample-sales-by-country',
             title: __('Sales by Country', 'sample-sales-by-country'),
             component: SalesByCountryReport
         },
