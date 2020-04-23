@@ -13,13 +13,11 @@ export class SalesByCountryReport extends ReactComponent {
     constructor(props) {
         super(props);
 
-        const {path, query} = this.props;
-        const dateQuery = this.createDateQuery(query);
+        const dateQuery = this.createDateQuery(this.props.query);
         const storeCurrency = new Currency(storeCurrencySetting);
 
         this.state = {
             dateQuery: dateQuery,
-            path: path,
             currency: storeCurrency,
             allCountries: [],
             data: { loading: true }
