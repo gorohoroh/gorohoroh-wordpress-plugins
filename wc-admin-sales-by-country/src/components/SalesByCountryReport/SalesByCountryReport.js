@@ -156,6 +156,8 @@ export class SalesByCountryReport extends ReactComponent {
             dateQuery={this.state.dateQuery}
             query={this.props.query}
             path={this.props.path}
+            currency={this.state.currency}
+            isoDateFormat={this.props.isoDateFormat}
             onDateSelect={this.handleDateChange}/>;
 
         const tableHeaders = [
