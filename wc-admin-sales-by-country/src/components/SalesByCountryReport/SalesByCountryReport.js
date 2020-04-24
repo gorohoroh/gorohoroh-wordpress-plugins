@@ -1,6 +1,6 @@
 import {Component as ReactComponent, Fragment} from "@wordpress/element";
 import {__} from "@wordpress/i18n";
-import {appendTimestamp, getCurrentDates, getDateParamsFromQuery} from "@woocommerce/date";
+import {appendTimestamp, getCurrentDates, getDateParamsFromQuery, isoDateFormat} from "@woocommerce/date";
 import apiFetch from "@wordpress/api-fetch";
 import {ChartPlaceholder, ReportFilters, SummaryList, SummaryListPlaceholder, SummaryNumber, TablePlaceholder} from "@woocommerce/components";
 import {default as Currency} from "@woocommerce/currency";
@@ -157,7 +157,7 @@ export class SalesByCountryReport extends ReactComponent {
             query={this.props.query}
             path={this.props.path}
             currency={this.state.currency}
-            isoDateFormat={this.props.isoDateFormat}
+            isoDateFormat={isoDateFormat}
             onDateSelect={this.handleDateChange}/>;
 
         const tableHeaders = [
