@@ -17,7 +17,7 @@ export class SalesByCountryReport extends ReactComponent {
         this.state = {
             dateQuery: dateQuery,
             currency: storeCurrency,
-            data: { mockData }
+            data: mockData
         }
     }
 
@@ -36,8 +36,23 @@ export class SalesByCountryReport extends ReactComponent {
                 currency={this.state.currency}
                 isoDateFormat={isoDateFormat}/>;
 
+        const {data, currency} = this.state;
+
         return <Fragment>
             {reportFilters}
+            <SummaryList>
+                {() => [
+                    <SummaryNumber key="sales"
+                                   value={currency.render(data.totals.total_sales)}
+                                   label={__("Total Sales", "wc-admin-sales-by-country")}/>,
+                    <SummaryNumber key="countries"
+                                   value={data.totals.countries}
+                                   label={__("Countries", "wc-admin-sales-by-country")}/>,
+                    <SummaryNumber key="orders"
+                                   value={data.totals.orders}
+                                   label={__("Orders", "wc-admin-sales-by-country")}/>
+                ]}
+            </SummaryList>
         </Fragment>
     }
 }
