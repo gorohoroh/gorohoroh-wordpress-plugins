@@ -44,13 +44,13 @@ export class SalesByCountryReport extends ReactComponent {
                 {() => [
                     <SummaryNumber key="sales"
                                    value={currency.render(data.totals.total_sales)}
-                                   label={__("Total Sales", "wc-admin-sales-by-country")}/>,
+                                   label={__("Total Sales", "sample-sales-by-country")}/>,
                     <SummaryNumber key="countries"
                                    value={data.totals.countries}
-                                   label={__("Countries", "wc-admin-sales-by-country")}/>,
+                                   label={__("Countries", "sample-sales-by-country")}/>,
                     <SummaryNumber key="orders"
                                    value={data.totals.orders}
-                                   label={__("Orders", "wc-admin-sales-by-country")}/>
+                                   label={__("Orders", "sample-sales-by-country")}/>
                 ]}
             </SummaryList>
         </Fragment>
