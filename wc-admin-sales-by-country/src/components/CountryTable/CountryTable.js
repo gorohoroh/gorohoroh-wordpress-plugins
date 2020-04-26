@@ -75,44 +75,21 @@ export class CountryTable extends ReactComponent {
         const currency = this.props.currency;
 
         const tableData = {
-            headers: this.props.headers,
-            rows: [],
-            summary: []
+            headers: this.props.headers.map(header => this.setHeaderSortOptions(header)),
+            rows: countryData.map(item =>
+                [
+                    {display: item.country, value: item.country},
+                    {display: currency.render(item.sales), value: item.sales},
+                    {display: `${item.sales_percentage}%`, value: item.sales_percentage},
+                    {display: item.orders, value: item.orders},
+                    {display: currency.render(item.average_order_value), value: item.average_order_value},
+                ]),
+            summary: [
+                {key: "sales", label: __("Sales in this period", "wc-admin-sales-by-country"), value: currency.render(totals.total_sales)},
+                {key: "orders", label: __("Orders in this period", "wc-admin-sales-by-country"), value: totals.orders},
+                {key: "countries", label: __("Countries in this period", "wc-admin-sales-by-country"), value: totals.countries},
+            ]
         };
-
-        tableData.headers.map(header => this.setHeaderSortOptions(header));
-
-        countryData.map(item => {
-            const row = [
-                {
-                    display: item.country,
-                    value: item.country
-                },
-                {
-                    display: currency.render(item.sales),
-                    value: item.sales
-                },
-                {
-                    display: `${item.sales_percentage}%`,
-                    value: item.sales_percentage
-                },
-                {
-                    display: item.orders,
-                    value: item.orders
-                },
-                {
-                    display: currency.render(item.average_order_value),
-                    value: item.average_order_value
-                },
-            ];
-            tableData.rows.push(row);
-        });
-
-        tableData.summary = [
-            {key: "sales", label: __("Sales in this period", "wc-admin-sales-by-country"), value: currency.render(totals.total_sales)},
-            {key: "orders", label: __("Orders in this period", "wc-admin-sales-by-country"), value: totals.orders},
-            {key: "countries", label: __("Countries in this period", "wc-admin-sales-by-country"), value: totals.countries},
-        ];
 
         return <TableCard
             className="table_top_countries"
