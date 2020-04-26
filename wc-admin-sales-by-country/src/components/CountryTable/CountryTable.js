@@ -30,6 +30,17 @@ export class CountryTable extends ReactComponent {
         return order === "asc" ? "desc" : "asc";
     }
 
+    setHeaderSortOptions(header) {
+        if (header.key === this.state.sortColumn) {
+            header.defaultSort = true;
+            header.defaultOrder = this.state.sortOrder;
+        } else {
+            if (header.defaultSort) delete header.defaultSort;
+            if (header.defaultOrder) delete header.defaultOrder;
+        }
+        return header;
+    }
+
     sort(data, column, sortOrder) {
         const appliedSortOrder = this.applySortOrder(sortOrder);
         return data.sort((a, b) => {
@@ -69,12 +80,7 @@ export class CountryTable extends ReactComponent {
             summary: []
         };
 
-        tableData.headers.map(header => {
-            if (header.key === this.state.sortColumn) {
-                header.defaultSort = true;
-                header.defaultOrder = this.state.sortOrder;
-            }
-        });
+        tableData.headers.map(header => this.setHeaderSortOptions(header));
 
         countryData.map(item => {
             const row = [
