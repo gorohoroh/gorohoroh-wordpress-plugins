@@ -5,6 +5,7 @@ import {__} from '@wordpress/i18n';
 import {appendTimestamp, getCurrentDates, getDateParamsFromQuery, isoDateFormat} from '@woocommerce/date';
 import {default as Currency} from '@woocommerce/currency';
 import {CURRENCY as storeCurrencySetting} from '@woocommerce/settings';
+import {CountryTable} from '../CountryTable/CountryTable';
 
 export class SalesByCountryReport extends ReactComponent {
 
@@ -36,23 +37,35 @@ export class SalesByCountryReport extends ReactComponent {
                 currency={this.state.currency}
                 isoDateFormat={isoDateFormat}/>;
 
+        const tableHeaders = [
+            {key: 'country', label: __('Country', 'wc-admin-sales-by-country'), isLeftAligned: true, isSortable: true, required: true},
+            {key: 'sales', label: __('Sales', 'wc-admin-sales-by-country'), isSortable: true, isNumeric: true},
+            {key: 'sales_percentage', label: __('Sales (percentage)', 'wc-admin-sales-by-country'), isSortable: true, isNumeric: true},
+            {key: 'orders', label: __('Number of Orders', 'wc-admin-sales-by-country'), isSortable: true, isNumeric: true},
+            {key: 'average_order_value', label: __('Average Order Value', 'wc-admin-sales-by-country'), isSortable: true, isNumeric: true},
+        ];
+
         const {data, currency} = this.state;
 
         return <Fragment>
             {reportFilters}
             <SummaryList>
                 {() => [
-                    <SummaryNumber key="sales"
+                    <SummaryNumber key='sales'
                                    value={currency.render(data.totals.total_sales)}
-                                   label={__("Total Sales", "sample-sales-by-country")}/>,
-                    <SummaryNumber key="countries"
+                                   label={__('Total Sales', 'sample-sales-by-country')}/>,
+                    <SummaryNumber key='countries'
                                    value={data.totals.countries}
-                                   label={__("Countries", "sample-sales-by-country")}/>,
-                    <SummaryNumber key="orders"
+                                   label={__('Countries', 'sample-sales-by-country')}/>,
+                    <SummaryNumber key='orders'
                                    value={data.totals.orders}
-                                   label={__("Orders", "sample-sales-by-country")}/>
+                                   label={__('Orders', 'sample-sales-by-country')}/>
                 ]}
             </SummaryList>
+            <CountryTable countryData={data.countries}
+                          totals={data.totals}
+                          currency={currency}
+                          headers={tableHeaders}/>
         </Fragment>
     }
 }
