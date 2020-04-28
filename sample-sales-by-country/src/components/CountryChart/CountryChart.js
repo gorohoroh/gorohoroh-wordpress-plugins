@@ -1,6 +1,7 @@
-import {__} from "@wordpress/i18n";
-import {Component as ReactComponent} from "@wordpress/element";
-import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {__} from '@wordpress/i18n';
+import {Component as ReactComponent} from '@wordpress/element';
+import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
+import {CustomTooltip} from "../CustomTooltip/CustomTooltip";
 
 export class CountryChart extends ReactComponent {
     render() {
@@ -12,21 +13,30 @@ export class CountryChart extends ReactComponent {
                 return 0;
             });
 
-        return <div className="countrychart-chart">
-            <div className="countrychart-chart__header">
-                <h2 className="countrychart-chart__title">Sales by Country</h2>
+        return <div className='countrychart-chart'>
+            <div className='countrychart-chart__header'>
+                <h2 className='countrychart-chart__title'>Sales by Country</h2>
             </div>
-            <div className="countrychart-chart__body countrychart-chart__body-column">
-                <div className="d3-chart__container">
-                    <ResponsiveContainer width="100%" height={300}>
+            <div className='countrychart-chart__body countrychart-chart__body-column'>
+                <div className='d3-chart__container'>
+                    <ResponsiveContainer width='100%' height={300}>
                         {chartData.length > 0
                             ? (<BarChart data={chartData}>
                                 <CartesianGrid vertical={false}/>
-                                <Bar dataKey="value" fill="#52accc"/>
-                                <XAxis dataKey="name"/>
+                                <Bar dataKey='value' fill='#52accc'/>
+                                <XAxis dataKey='name'/>
                                 <YAxis domain={[0, dataMax => (Math.round(dataMax * 1.05 / 100) * 100)]}/>
+                                <Tooltip
+                                    cursor={{fill: 'rgba(0, 0, 0, 0.1)'}}
+                                    content={({active, payload, label}) => {
+                                        return !active ? null :
+                                            (<CustomTooltip payload={payload}
+                                                            label={label}
+                                                            dateRange={this.props.dateRange}
+                                                            currency={this.props.currency}/>);
+                                    }}/>
                             </BarChart>)
-                            : <div className="d3-chart__empty-message">{__("No data for the selected date range", "wc-admin-sales-by-country")}</div>
+                            : <div className='d3-chart__empty-message'>{__('No data for the selected date range', 'wc-admin-sales-by-country')}</div>
                         }
                     </ResponsiveContainer>
                 </div>
