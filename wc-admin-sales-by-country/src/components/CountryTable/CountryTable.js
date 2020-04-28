@@ -22,10 +22,6 @@ export class CountryTable extends ReactComponent {
         }
     }
 
-    applySortOrder(order) {
-        return order === "asc" ? 1 : -1;
-    }
-
     changeSortOrder(order) {
         return order === "asc" ? "desc" : "asc";
     }
@@ -42,7 +38,7 @@ export class CountryTable extends ReactComponent {
     }
 
     sort(data, column, sortOrder) {
-        const appliedSortOrder = this.applySortOrder(sortOrder);
+        const appliedSortOrder = sortOrder === "asc" ? 1 : -1;
         return data.sort((a, b) => {
             if (a[column] > b[column]) return appliedSortOrder;
             if (a[column] < b[column]) return -1 * appliedSortOrder;
@@ -96,7 +92,6 @@ export class CountryTable extends ReactComponent {
             title={__("Top Countries", "wc-admin-sales-by-country")}
             rows={tableData.rows}
             headers={tableData.headers}
-            query={{page: 1}}
             rowsPerPage={100}
             totalRows={tableData.rows.length}
             summary={tableData.summary}
