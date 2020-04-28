@@ -22,6 +22,8 @@ export class SalesByCountryReport extends ReactComponent {
             data: { loading: true }
         };
 
+        this.handleDateChange = this.handleDateChange.bind(this);
+
         this.fetchData(this.state.dateQuery);
     }
 
@@ -140,6 +142,12 @@ export class SalesByCountryReport extends ReactComponent {
         return Math.round(propertyTotal * 100) / 100;
     }
 
+    handleDateChange(newQuery) {
+        const newDateQuery = this.createDateQuery(newQuery);
+        this.setState({dateQuery: newDateQuery});
+        this.fetchData(newDateQuery);
+    }
+
     render() {
         const reportFilters =
             <ReportFilters
@@ -147,7 +155,8 @@ export class SalesByCountryReport extends ReactComponent {
                 query={this.props.query}
                 path={this.props.path}
                 currency={this.state.currency}
-                isoDateFormat={isoDateFormat}/>;
+                isoDateFormat={isoDateFormat}
+                onDateSelect={this.handleDateChange} />;
 
         const tableHeaders = [
             {key: 'country', label: __('Country', 'wc-admin-sales-by-country'), isLeftAligned: true, isSortable: true, required: true},
