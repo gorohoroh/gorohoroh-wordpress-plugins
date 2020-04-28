@@ -1,7 +1,8 @@
+import './CountryChart.scss'
 import {__} from '@wordpress/i18n';
 import {Component as ReactComponent} from '@wordpress/element';
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
-import {CustomTooltip} from "../CustomTooltip/CustomTooltip";
+import {CustomTooltip} from '../CustomTooltip/CustomTooltip';
 
 export class CountryChart extends ReactComponent {
     render() {
