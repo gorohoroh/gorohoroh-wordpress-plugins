@@ -6,6 +6,7 @@ import {appendTimestamp, getCurrentDates, getDateParamsFromQuery, isoDateFormat}
 import {default as Currency} from '@woocommerce/currency';
 import {CURRENCY as storeCurrencySetting} from '@woocommerce/settings';
 import {CountryTable} from '../CountryTable/CountryTable';
+import {CountryChart} from '../CountryChart/CountryChart';
 
 export class SalesByCountryReport extends ReactComponent {
 
@@ -166,7 +167,7 @@ export class SalesByCountryReport extends ReactComponent {
             {key: 'average_order_value', label: __('Average Order Value', 'wc-admin-sales-by-country'), isSortable: true, isNumeric: true},
         ];
 
-        const {data, currency} = this.state;
+        const {data, currency, dateQuery} = this.state;
 
         if (this.state.data.loading) {
             return <Fragment>
@@ -192,6 +193,9 @@ export class SalesByCountryReport extends ReactComponent {
                                        label={__('Orders', 'sample-sales-by-country')}/>
                     ]}
                 </SummaryList>
+                <CountryChart chartData={data.countries}
+                              dateRange={dateQuery.primaryDate.range}
+                              currency={currency}/>
                 <CountryTable countryData={data.countries}
                               totals={data.totals}
                               currency={currency}
