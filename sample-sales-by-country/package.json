@@ -23,11 +23,12 @@
     "node-sass": "4.13.0"
   },
   "dependencies": {
-    "@wordpress/hooks": "^2.7.0",
-    "@wordpress/i18n": "^3.9.0",
     "@woocommerce/components": "^4.0.0",
-    "@woocommerce/date": "^2.0.0",
     "@woocommerce/currency": "^2.0.0",
-    "@woocommerce/settings": "^1.0.0"
+    "@woocommerce/date": "^2.0.0",
+    "@woocommerce/settings": "^1.0.0",
+    "@wordpress/api-fetch": "^3.13.1",
+    "@wordpress/hooks": "^2.7.0",
+    "@wordpress/i18n": "^3.11.0"
   }
 }
