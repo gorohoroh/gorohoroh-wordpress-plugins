@@ -168,7 +168,14 @@ export class SalesByCountryReport extends ReactComponent {
 
         const {data, currency} = this.state;
 
-        if (this.state.data.loading) { return <p>Waiting...</p> }
+        if (this.state.data.loading) {
+            return <Fragment>
+                {reportFilters}
+                <SummaryListPlaceholder numberOfItems={3}/>
+                <ChartPlaceholder height={300}/>
+                <TablePlaceholder caption={__("Top Countries", "wc-admin-sales-by-country")}
+                                  headers={tableHeaders}/>
+            </Fragment> }
         else {
             return <Fragment>
                 {reportFilters}
