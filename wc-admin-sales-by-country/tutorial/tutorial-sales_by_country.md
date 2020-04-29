@@ -11,6 +11,7 @@ If you've missed prior talk about this new JavaScript experience, here are some 
 In this tutorial, we'll take a closer look at this new extensibility model. We're going to walk through the process of creating a fully functional WooCommerce extension that displays an independent analytics report, gets data from WooCommerce's REST API, processes the data using JavaScript, gets a native look and feel by using a set of WooCommerce's own library of React components, integrates a third-party component when native components aren't enough, and gets by with only 60 lines of PHP code, of which 35 are generated.
 
 By the end of the tutorial, the resulting extension should look like this:
+
 ![The resulting extension](img/expected_outcome.png)
 
 - [What we're going to do](#what-were-going-to-do)
@@ -133,6 +134,7 @@ This will add our extension's page to the [list of pages](https://github.com/woo
 #### Integrating the extension into WooCommerce's own breadcrumbs navigation
 
 When WooCommerce 4 integrates into WordPress admin area, it creates a breadcrumbs navigation system that tries to glue together WooCommerce pages that are somewhat scattered across the admin area:
+
 ![WooCommerce breadcrumbs navigation](img/wc_breadcrumbs_navigation_area.png)
 
 Let's add our extension to this navigation system right away. This is done on the frontend, so we'll take a first look at the JavaScript side of WooCommerce Admin extensions.
@@ -371,6 +373,7 @@ Now that the groundwork is complete, let's finally add a date range selector to 
    We called this method from the constructor to create a date query, and this is how it's implemented. All it does is call two methods that we imported from `'@woocommerce/date'`, and wraps the resulting data into a single object. We'll use this method again when we create an event handler that updates `SalesByCountryReport` every time we select a new date range.
 
 If you refresh our extension's page in the browser, you can see that it now contains a date range selector, just like the one used in out-of-the-box WooCommerce analytics reports. Nice!
+
 ![Date range selector](img/date_range.png)
 
 ### Adding a report summary
@@ -407,6 +410,7 @@ Let's take a closer look at the `SummaryList` component:
 * To read more about `SummaryList`, `SummaryNumber` and `SummaryListPlaceholder`, [see the docs](https://woocommerce.github.io/woocommerce-admin/#/components/packages/summary/README).
 
 What if we hit refresh in our browser right now? Let's see:
+
 ![Summary list with mock data](img/date_range_and_summary_list.png) 
 
 Looks slick, doesn't it? It feels consistent with other analytics reports, and the total sales number is formatted properly! It does have a few N/A's here and there, and that's because we don't provide data for a previous period to compare the current date range with. In fact, we won't be adding support for previous periods in this tutorial, so let's just make sure these N/As feel right at home.
@@ -822,10 +826,12 @@ Our extension already looks nice &mdash; that is, until we realize we're still d
 
 13. Go to the root of the `src` folder, and delete `mockData.js`: you won't need it from now on.
 
-Let's refresh our extension page, and see what it displays: 
+Let's refresh our extension page, and see what it displays:
+ 
 ![Our extension with real data fetched from WooCommerce](img/fetch_implemented.png)
 
 This smells like success! There are 44 countries listed for the selected period: if we scroll down a few times, here's what the end of the table looks like:
+
 ![Out extension with real data, end of table](img/fetch_implemented_2.png)
 
 Granted, since this is live data, you'll see different numbers, and probably a different currency setting, in your own installation.
@@ -875,6 +881,7 @@ When data is loading, our extension currently says "Waiting...", and that's all 
    These are placeholder components for summary list, chart, and table that WooCommerce provides as part of its React component library. For the summary list placeholder, we specify how many summary blocks we want, for the chart we specify the desired height in pixels, and for the table we provide a caption and the same set of headers that we pass over to our `CountryTable` component. Note that before any of these components, we render the same `ReportFilters` that we use for loaded data. That's because it doesn't need to wait for new data: it already displays the new date range.
 
 When you refresh our extension's page in the browser, here's what you will now see while data is loading:
+
 ![Native placeholder components](img/placeholders.png)
 
 ### Adding a chart component to visualize per-country data
@@ -960,6 +967,7 @@ As you may recall, native chart components provided by WooCommerce are limited i
    * `ResponsiveContainer` is wrapped in a cascade of `div` elements that use classes from WooCommerce's own spreadsheets. This helps make our component feel as consistent with native components as possible.
    
 If we now refresh our extension's page in the browser, we should see something like this:
+
 ![Bar chart](img/bar_chart_initial.png)
 
 #### Adding a custom tooltip
@@ -1025,6 +1033,7 @@ Having a bird's-eye view of sales breakdown by country like this is useful, but 
     ```
 
 If we now refresh our extension's page and hover over a bar in the bar chart, we should now see a tooltip showing total sales for the selected country:
+
 ![Tooltip over the bar chart](img/bar_chart_tooltip.png)
 
 #### Styling the bar chart
@@ -1109,6 +1118,7 @@ Our bar chart is fully functional, which is great! Still, there are a few detail
     ```
 
 If we refresh our extension's page in the browser, here's what we'll see:
+
 ![Restyled bar chart component](img/bar_chart_styled.png)
 
 This is much nicer! Background color, layout of the chart header, font properties used in chart labels, transparent ticks on the Y axis, line strokes in the grid: the new styles allow for much less contrast with the adjacent native components.
@@ -1116,6 +1126,7 @@ This is much nicer! Background color, layout of the chart header, font propertie
 ### Finishing touches
 
 We're nearly done, and there's only one minor thing left to do. Our bar chart and our table both have headers, and the styles of these headers currently look very different:
+
 ![Table and bar chart header styles](img/header_styles_before.png)
 
 Let's modify the table header to make it look consistent with the bar chart header:
@@ -1141,11 +1152,13 @@ Let's modify the table header to make it look consistent with the bar chart head
     ```
 
 This should be enough to make the styles of the two headers consistent:
+
 ![Table and bar chart header styles made consistent](img/header_styles_after.png)
 
-Finally, let's get rid of something that we haven't used since it was generated: under `src\components`, remove the empty `index.scss` stylesheet.
+Finally, let's get rid of something that we haven't used since it was generated: under `src\components`, delete the empty `index.scss` stylesheet.
 
 ### That's it!
 
 We have come a long way since facing the boilerplate extension code that WooCommerce helped us generate. What we have now is a fully functional WooCommerce extension that fetches and transforms WooCommerce store data via REST API, visualizes the data using both components provided by WooCommerce and third-party components, and has a near-native look and feel: 
+
 ![Completed extension](img/complete.png)
