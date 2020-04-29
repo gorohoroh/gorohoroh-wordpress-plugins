@@ -1,14 +1,14 @@
-## Extending WooCommerce to show sales by country using WooCommerce Admin components 
+## Extending WooCommerce to show sales by country using JavaScript and React 
 
-With the [release of WooCommerce 4.0](https://woocommerce.wordpress.com/2020/03/10/woocommerce-4-0-is-here/), extension developers can take advantage of a new WooCommerce extensibility model based on JavaScript and React. You use this new model when you modify existing or create new analytics reports, add new widgets to the new WooCommerce dashboard, or hook into WooCommerce breadcrumbs navigation.
+With the [release of WooCommerce 4.0](https://woocommerce.wordpress.com/2020/03/10/woocommerce-4-0-is-here/) that now includes the [WooCommerce Admin](https://wordpress.org/plugins/woocommerce-admin/) plugin, extension developers can take advantage of a **new WooCommerce extensibility model based on JavaScript and React**. You can use this new model when you modify existing or create new analytics reports, add new widgets to the new WooCommerce dashboard, or hook into WooCommerce breadcrumbs navigation.
 
-If you've missed prior talk about this new JavaScript experience, here are some helpful links:
+If you've missed prior talk about this new JavaScript-focused experience that has evolved as part of WooCommerce Admin, here are some helpful links:
 * [Alpha-Test The New Javascript-driven WooCommerce Interface: Dashboard, Activity Panel, and Reports](https://woocommerce.wordpress.com/2018/10/18/wc-admin/)
 * [Extending WC-Admin Reports](https://woocommerce.wordpress.com/2020/02/20/extending-wc-admin-reports/)
 * [Integrating The New WooCommerce Navigation Bar](https://woocommerce.wordpress.com/2020/02/27/integrating-the-new-woocommerce-navigation-bar/)
 * [WooCommerce Admin Components](https://woocommerce.github.io/woocommerce-admin/#/components/)
 
-In this tutorial, we'll take a closer look at this new extensibility model. We're going to walk through the process of creating a fully functional WooCommerce extension that displays an independent analytics report, gets data from WooCommerce's REST API, processes the data using JavaScript, gets a native look and feel by using a set of WooCommerce's own library of React components, integrates a third-party component when native components aren't enough, and gets by with only 60 lines of PHP code, of which 35 are generated.
+In this tutorial, we'll take a closer look at this new extensibility model. We're going to walk through the process of creating a **fully functional WooCommerce extension** that displays an independent analytics report, gets data from **WooCommerce REST API**, processes the data using JavaScript, gets a native look and feel by using a set of WooCommerce's own **library of React components**, integrates a **third-party component** when native components aren't enough, and gets by with only 60 lines of PHP code, of which 35 are generated.
 
 By the end of the tutorial, the resulting extension should look like this:
 
@@ -45,32 +45,33 @@ By the end of the tutorial, the resulting extension should look like this:
 
 ### What we're going to do
 
-To illustrate how the new WooCommerce Admin can help extensibility, let's take an existing WooCommerce extension that makes heavy use of data visualization, and see how we can create something similar with the new PHP+React architecture.
+To illustrate the new extensibility model driven by WooCommerce Admin, let's take an existing WooCommerce extension that makes heavy use of data visualization, and see how we can create something similar using JavaScript and React.
 
-The extension that we're going to take inspiration from is [Sales Report By Country for WooCommerce](https://www.zorem.com/products/woocommerce-sales-report-by-country/). The extension adds an additional report tab which display sales report by country. It's available in WooCommerce's legacy Reports view (WP-Admin | WooCommerce | Reports), and looks like this:
+The extension that we're going to take inspiration from is [Sales Report By Country for WooCommerce](https://www.zorem.com/products/woocommerce-sales-report-by-country/). The extension adds an additional report tab that breaks down sales by country. It's available in WooCommerce's legacy *Reports* view (*WP-Admin | WooCommerce | Reports*), and looks like this:
 
 ![Sales by Country extension](img/woo_sales_by_country.png)
 
 Let's break the extension down to individual components. It provides:
 * A date range selector.
-* An area to display total sales, orders and countries for a selected date range
+* An area to display total sales, orders and countries for a selected date range.
 * A leaderboard-style table representing top 10 countries where orders from a selected date range are coming from.
 * Country and region selectors that help focus on one or multiple countries or regions. Each of the selectors accepts multiple filters.
 * A chart area to visualize data based on selected filters.
 * Chart type controls. By default, a bar chart is used for visualization, but you can opt to use a line chart or a pie chart instead.
 * Export to CSV.
 
-We'll not necessarily try to implement all of these features, but we'll see how far we can go.
-<!-- Additionally, since the new WooCommerce Admin provides an extensible dashboard (see WooCommerce | Dashboard), we'll also try to add a widget to the dashboard that shows leading countries. -->
+We will not necessarily try to implement all of these features, but we'll see how far we can go.
 
 ### What you'll need
+
 * A local WordPress 5.3+ installation.
 * WooCommerce 4.0 or later.
 * Git.
 * Node.js 12.0.0+. (Your installation will need to bundle npm 6.9 or later, which corresponds to Node.js 12.0.0 or later.)
 
 ### Preparing to get started
-Although WooCommerce Admin is now bundled with WooCommerce, it's still maintained as a plugin with a separate code base. This is what you'll need to clone for the best development experience:
+
+Although WooCommerce Admin is now bundled with WooCommerce, it's still maintained as a plugin with a separate code base. This is what you'll need to use for the best development experience.
 
 1. Clone the [*wc-admin* repo](https://github.com/woocommerce/woocommerce-admin) to your local WordPress installation's *wp-content/plugins* directory.
 
@@ -81,16 +82,17 @@ Although WooCommerce Admin is now bundled with WooCommerce, it's still maintaine
 ### Creating a standalone report
 
 #### Scaffolding with the starter pack
-WooCommerce Admin provides something called a "starter pack" &mdash; a way to generate code that will serve as a starting point for developing a new extension. Among other files, the starter pack contains entry points for PHP and JavaScript parts of our new extension, `package.json` with default dependencies and available scripts, and `webpack.config.js` that defines the JavaScript and Scss build processes.
+
+WooCommerce Admin provides something called a "starter pack" &mdash; a way to generate code that will serve as a starting point for developing a new extension. Among other files, the starter pack contains entry points for PHP and JavaScript parts of our new extension, `package.json` with default dependencies and available scripts, and `webpack.config.js` that defines JavaScript and Scss build processes using [Webpack](https://webpack.js.org/).
   
-Here's how to generate a new extension using the starter pack:
+Here's how to generate boilerplate code for a new extension using the starter pack:
 
 1. While still in the root of the cloned WooCommerce Admin repo, run `npm run create-wc-extension` to start scaffolding an extension template. When asked to specify a name for the extension, enter `sample-sales-by-country`. As a result, the new extension will be scaffolded in a new subdirectory under your WordPress installation's `/wp-content/plugins/` directory:
 ![Plugin directory right after scaffolding](img/plugin_directory_after_scaffolding.png)
 
-2. Go to our extension's directory that the starter pack has generated. Once there, run `npm install` to obtain JavaScript dependencies defined in our extension's `package.json` file.
+2. Go to the root directory of the extension that the starter pack has generated. Once there, run `npm install` to obtain JavaScript dependencies defined in the extension's `package.json` file.
 
-3. Once dependencies are installed, run `npm start` for Webpack to spawn a development server and start watching for changes in JavaScript code to compile them on-the-fly.
+3. Once dependencies are installed, run `npm start`. As a result, Webpack will spawn a development server and start watching for changes in JavaScript code to compile them on-the-fly.
 
 4. In our extension's `.php` file, rename the registration function to make sure it has a unique name (such as `add_sample_sales_by_country_register_script`), and update the second argument in the `add_action()` call accordingly:
     ```php
@@ -101,9 +103,10 @@ Here's how to generate a new extension using the starter pack:
     add_action( 'admin_enqueue_scripts', 'add_sample_sales_by_country_register_script' );
     ```
 
-5. Go to the admin area of your local WordPress installation, locate our extension under *Plugins | Install Plugins*, and activate the extension.
+5. Go to the admin area of your local WordPress installation, locate the new extension under *Plugins | Install Plugins*, and activate it.
 
 #### Making the extension discoverable via WordPress admin sidebar
+
 Our extension is now live but it doesn't do anything. Let's start by making it discoverable in the section of WordPress Admin that WooCommerce uses.
 
 First, let's add a link to the extension's page to WordPress Admin's sidebar. All WooCommerce reports powered by WooCommerce Admin are available under the *Analytics* group, so we'll add our extension there as well. To do this, we'll need to hook into a backend filter called `woocommerce_analytics_report_menu_items`.
@@ -137,9 +140,9 @@ When WooCommerce 4 integrates into WordPress admin area, it creates a breadcrumb
 
 ![WooCommerce breadcrumbs navigation](img/wc_breadcrumbs_navigation_area.png)
 
-Let's add our extension to this navigation system right away. This is done on the frontend, so we'll take a first look at the JavaScript side of WooCommerce Admin extensions.
+Let's add our extension to this navigation system right away. This is done on the frontend, so we'll take a first look at the JavaScript side of extensions powered by WooCommerce Admin.
 
-1. Install 3 new dependencies that provide access to the JavaScript implementation of WordPress filter and action extensibility functions, frontend internationalization functions, and WordPress's own wrapper over React. To do this, run the following command in our extension's root directory: 
+1. You need to install 3 new dependencies that provide access to the JavaScript implementation of WordPress filter and action extensibility functions, frontend internationalization functions, and WordPress's own wrapper over React. To do this, run the following command in our extension's root directory: 
     ```shell script
     npm install @wordpress/hooks @wordpress/i18n @woocommerce/components
     ```
@@ -181,12 +184,13 @@ After refreshing our report's page in WordPress admin, we now should see the bre
 ![Breadcrumbs navigation for an extension](img/breadcrumbs_with_sales_by_country.png)
 
 ### Exploring available React components
-Earlier, we have broken the "legacy" report extension that we're taking inspiration from down into constituents. Let's see how we can replicate these using the library of React components that WooCommerce Admin provides to us:
 
-* A **date range selector** can be expressed by the `ReportFilters` component that combines powerful date range selection with filtering based on a specific report's purpose. We won't be implementing advanced filters in our report, but it's nice to know that this option is available. For example, here's how `ReportFilters` combines date range selection and various options for filtering by category in WooCommerce Admin's native *Categories* report:
+Earlier, when talking about the existing extension that we're taking inspiration from, we have broken it down into constituents. Let's see how we can replicate these using the [library of React components](https://woocommerce.github.io/woocommerce-admin/#/components/) that WooCommerce Admin provides to us:
+
+* A **date range selector** can be expressed by the `ReportFilters` component that combines powerful date range selection with advanced filtering. We won't be implementing advanced filters in our report, but it's nice to know that this option is available. For example, here's how `ReportFilters` combines date range selection and various options for filtering by category in WooCommerce's native *Categories* report:
 ![ReportFilters in the Categories report](img/component_reportfilters_categories.png)
 * To **display total sales, orders and countries** for a selected date range, we can use `ReportSummary`. In out-of-the-box reports, this component looks like a set of cards that display stats and show stat-specific charts when clicked on.
-* To **display top countries** where orders come from, we'll need to create a table component like [`RevenueReportTable`](https://github.com/woocommerce/woocommerce-admin/blob/fe7b6cca7a095d1a39043bd1b38fc055cf0b121d/client/analytics/report/revenue/table.js) and similar components that are used in all out-of-the-box reports for tabular data. This one will probably be based on the `TableCard` component that's available to us via the `@woocommerce/components` package. 
+* To **display top countries** where orders come from, we'll need to create a wrapper table component like [`RevenueReportTable`](https://github.com/woocommerce/woocommerce-admin/blob/fe7b6cca7a095d1a39043bd1b38fc055cf0b121d/client/analytics/report/revenue/table.js) and similar components that are used in all out-of-the-box reports for tabular data. This one will probably be based on the `TableCard` component that's available to us via the `@woocommerce/components` package.
 * For a chart area to **visualize data** based on selected filters, out-of-the-box reports use `ReportChart`. It's built upon another component, `Chart`, that is available via the`@woocommerce/components` package. However, there's something that prevents us from using either of these two components: they both can only plot *time series data* on the X axis. This is fine when we need to break down orders or sales by day, week, month or quarter, but leads us nowhere if we want to break data down by anything other than a time period. Since our goal is to break revenue down by customer country, we'll need to choose a **third-party component**.
 
 ### Extracting the extension's main React component to a separate file 
@@ -219,7 +223,8 @@ Now that we've discussed available React components, let's extract our main comp
 We now have a file structure to host our main React component, `SalesByCountryReport`, and extend it further.
 
 ### Adding mock data while live data isn't available
-Before we proceed to fetching real data from WooCommerce, let's use mock data so that we have something to build our UI upon.
+
+Before we move on to fetch real data from WooCommerce REST API, let's use mock data so that we have something to build our UI upon.
 
 1. In the `src` directory where `index.js` resides, create a new JavaScript file called `mockData.js`.
 
@@ -298,7 +303,8 @@ Before we proceed to fetching real data from WooCommerce, let's use mock data so
 Speaking of state, there are multiple **approaches to state management** in React: the regular [React state](https://reactjs.org/docs/state-and-lifecycle.html) in class components, the [state hook](https://reactjs.org/docs/hooks-state.html) in function components, [Redux](https://redux.js.org/), as well as the more WordPress-specific [@wordpress/data](https://developer.wordpress.org/block-editor/packages/packages-data/). We're going to use the regular React state for the sake of simplicity, although in larger applications, this approach is arguably not ideal in terms of maintainability and separation of concerns.
 
 ### Adding a date range selector
-Let's start populating our main component, `SalesByCountryReport`, with other components that will make up our extension's UI. We'll start with WooCommerce's standard `ReportFilters` component (see [component docs](https://woocommerce.github.io/woocommerce-admin/#/components/packages/filters/README)) that is used across out-of-the-box analytics reports to select a date range. This component is trivial to render and requires no customization, but it does require a few props to be passed to it, and to do that, we'll need to lay some groundwork.
+
+Let's start populating our main component, `SalesByCountryReport`, with other components that will make up our extension's UI. We'll start with WooCommerce's standard [`ReportFilters` component](https://woocommerce.github.io/woocommerce-admin/#/components/packages/filters/README) that is used in out-of-the-box analytics reports to select a date range. This component is trivial to render and requires no customization, but it does require a few props to be passed to it, and to do that, we'll need to lay some groundwork.
 
 #### The groundwork
 
@@ -360,7 +366,7 @@ Now that the groundwork is complete, let's finally add a date range selector to 
         }
     }
     ```
-   This is where we create a date query from the larger query that WooCommerce supplies to our component, in order to pass it over to `ReportFilters` that requires it. This is where we're getting a currency setting from WooCommerce and use it to initialize a `Currency` object that we will later use for currency formatting. We're also saving both `dateQuery` and `currency` to `SalesByCountryReport`'s state because we'll need to pass them to other components. Note that the method used to create a date query is not implemented yet, so let's fix this.
+   This is where we create a date query from the larger query that WooCommerce supplies to our component, in order to pass it over to `ReportFilters` that requires it. This is where we're getting a currency setting from WooCommerce and use it to initialize a `Currency` object that we will later use for currency formatting. We're also saving both `dateQuery` and `currency` to `SalesByCountryReport`'s state because we'll need to pass these values to other components. Note that the method used to create a date query is not implemented yet, so let's fix this.
 
 3. Create a new method in the `SalesByCountryReport` class:
     ```javascript
@@ -370,13 +376,14 @@ Now that the groundwork is complete, let's finally add a date range selector to 
         return {period, compare, before, after, primaryDate, secondaryDate};
     }
     ```
-   We called this method from the constructor to create a date query, and this is how it's implemented. All it does is call two methods that we imported from `'@woocommerce/date'`, and wraps the resulting data into a single object. We'll use this method again when we create an event handler that updates `SalesByCountryReport` every time we select a new date range.
+   We called this method from the constructor to create a date query, and this is how it's implemented. All it does is call two methods that we imported from `'@woocommerce/date'`, and wrap the resulting data into a single object. We'll use this method again when we create an event handler that updates `SalesByCountryReport` every time we select a new date range.
 
 If you refresh our extension's page in the browser, you can see that it now contains a date range selector, just like the one used in out-of-the-box WooCommerce analytics reports. Nice!
 
 ![Date range selector](img/date_range.png)
 
 ### Adding a report summary
+
 Let's now add a summary area to display total sales, orders and countries. Remember that `SalesByCountryReport` has mock data loaded into its state, and we can display that data for our UI to make sense.
 
 1. In `SalesByCountryReport`'s `render()` method, add the following code right before the `return` statement:
@@ -402,23 +409,24 @@ Let's now add a summary area to display total sales, orders and countries. Remem
     ```
 
 Let's take a closer look at the `SummaryList` component:
-* Note how it doesn't receive `SummaryNumber` components as immediate children; rather, it receives a function that returns an array of `SummaryNumber` components.
-* Each `SummaryNumber` component has 3 props.
-* The `key` prop provides a stable identity for each `SummaryNumber`. This is important because under the hood, a `SummaryNumber` is a list item, and list items in React [must have unique keys](https://reactjs.org/docs/lists-and-keys.html#keys).
-* In the first `SummaryNumber` component, value is formatted with the `render()` method of the `Currency` class that we have instantiated in the constructor. This method makes sure to use the right currency symbol and decimal separator for whatever currency is set as the default in WooCommerce. 
-* Labels are wrapped in an internationalization method call, which makes it easy to localize our extension to different languages if necessary.
-* To read more about `SummaryList`, `SummaryNumber` and `SummaryListPlaceholder`, [see the docs](https://woocommerce.github.io/woocommerce-admin/#/components/packages/summary/README).
+* Note how it doesn't receive `SummaryNumber` components as immediate children; instead, it receives a function that returns an array of `SummaryNumber` components.
+* Each `SummaryNumber` component has 3 props:
+    * The `key` prop provides a stable identity for each `SummaryNumber`. This is important because under the hood, a `SummaryNumber` is a list item, and list items in React [must have unique keys](https://reactjs.org/docs/lists-and-keys.html#keys).
+    * In the first `SummaryNumber` component, `value` is formatted with the `render()` method of the `Currency` class that we have instantiated in the constructor. This method makes sure to use the right currency symbol and decimal separator for whatever currency is set as the default in WooCommerce.
+    * Labels are wrapped in an internationalization method call, which makes it easy to localize our extension to different languages if necessary.
+* To read more about `SummaryList`, `SummaryNumber` and `SummaryListPlaceholder`, [see WooCommerce Admin developer docs](https://woocommerce.github.io/woocommerce-admin/#/components/packages/summary/README).
 
 What if we hit refresh in our browser right now? Let's see:
 
 ![Summary list with mock data](img/date_range_and_summary_list.png) 
 
-Looks slick, doesn't it? It feels consistent with other analytics reports, and the total sales number is formatted properly! It does have a few N/A's here and there, and that's because we don't provide data for a previous period to compare the current date range with. In fact, we won't be adding support for previous periods in this tutorial, so let's just make sure these N/As feel right at home.
+Looks slick, doesn't it? It feels consistent with other analytics reports, and the total sales number is formatted properly. It does have a few N/A's here and there, and that's because we don't provide data for a previous period to compare the current date range with. In fact, we won't be adding support for previous periods in this tutorial, so let's just make sure these N/A's feel right at home.
 
 ### Adding a table view
+
 So far our extension only displays totals for countries, orders and sales. Let's now create a table that will display per-country sales performance.
 
-To do this, we'll use [TableCard](https://woocommerce.github.io/woocommerce-admin/#/components/packages/table/README), a component that is shipped as part of the `@woocommerce/components` library and is very similar to what WooCommerce uses in its out-of-the-box analytics reports. It combines a table, a table summary row to display totals, and a pagination control. We won't be using pagination, but otherwise `TableCard` is exactly what we need for tabular data presentation.
+To do this, we'll use [`TableCard`](https://woocommerce.github.io/woocommerce-admin/#/components/packages/table/README), a component that is shipped as part of the `@woocommerce/components` library and is very similar to what WooCommerce uses in its out-of-the-box analytics reports. It combines a table, a table summary row to display totals, and a pagination control. We won't be using pagination, but otherwise `TableCard` is exactly what we need for tabular data presentation.
 
 #### Creating a custom component to prepare table data
 
@@ -440,7 +448,7 @@ Since `TableCard` requires quite a lot of configuration to define table headers,
         {key: 'average_order_value', label: __('Average Order Value', 'wc-admin-sales-by-country'), isSortable: true, isNumeric: true},
     ];
     ```
-   This is how we configure table headers for our future `CountryTable` component. The reason we do it inside `SalesByCountryReport` is that later we'll also need to pass these headers to a table placeholder component.  
+   This is how we configure table headers for our future `CountryTable` component. The reason we do this inside `SalesByCountryReport` is that later we'll also need to pass these headers to a table placeholder component.  
 
 3. Scroll down to the return statement of the `render()` method. Set the caret at the line after the closing element of our summary list (`</SummaryList>`), and paste the following code:
     ```javascript
@@ -449,7 +457,7 @@ Since `TableCard` requires quite a lot of configuration to define table headers,
                   currency={currency}
                   headers={tableHeaders}/>
     ```
-    This is how we render our `CountryTable` component. It's still not declared though, so let's do this.
+   This is how we render our `CountryTable` component. It's still not declared though, so let's do this.
 
 4. Under `src\components`, create a new subdirectory, `CountryTable`. 
 
@@ -496,6 +504,7 @@ Since `TableCard` requires quite a lot of configuration to define table headers,
         }
     }
     ```
+
 Let's see what's inside the code you've just pasted:
 * `CountryTable` is another React class component that currently only has the `render()` method implemented. There's no state in this component yet, so we can safely skip any custom constructor logic.
 * In `render()`, the `tableData` constant collects headers, rows, and summary that are later passed to WooCommerce's native `TableCard` component:
@@ -548,20 +557,22 @@ The way per-country data is sorted in our table sounds like something that the t
         });
     }
     ```
-    Our `sort()` method in `CountryTable` invokes JavaScript's [built-in array sort method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) on our per-country data array, and passes it a function that tells it what exactly should be compared &mdash; values in the particular column that we want to sort by. However, before doing this, the `appliedSortOrder` constant is used to establish the sort order that we want to apply. If the method receives a string representing the ascending order, the `appliedSortOrder` constant is assigned `1`, which doesn't have any effect on the subsequent sort operation. If the method receives a string representing the descending order, `appliedSortOrder` is set to `-1`, and when passed to the compare function, this value reverses the order of items in the resulting sorted array.
+    Our `sort()` method in `CountryTable` invokes JavaScript's [built-in array sort method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) on our per-country data array, and passes it a function that defines what exactly should be compared &mdash; values in the particular column that we want to sort by. However, before doing this, the `appliedSortOrder` constant establishes the sort order that we want to apply. If the method receives a string representing the ascending order, the `appliedSortOrder` constant is assigned `1`, which doesn't have any effect on the subsequent sort operation. If the method receives a string representing the descending order, `appliedSortOrder` is set to `-1`, and when passed to the compare function, this value reverses the order of items in the resulting sorted array.
    
-3. A constructor, `sort()`, and `applySortOrder()` is all we need to get per-country data sorted by default. In order to actually render the sorted data, we need to make a small but important change in the `render()` method. In the first line in `render()`, you should have the `countryData` constant declared and initialized. Select its initialization expression, `this.props.countryData`, and replace it with this:
+3. A constructor, `sort()`, and `applySortOrder()` is all we need to get per-country data sorted by default. In order to actually render the sorted data, we need to make a small but important change. In the first line in `render()`, you should have the `countryData` constant declared and initialized. Select its initialization expression, `this.props.countryData`, and replace it with this:
     ```javascript
     this.state.countryData
     ```
+   
 ##### Enabling changes to sort column and order
+
 So far we've managed to apply the default sort order to the per-country data that the `CountryTable` component receives from `SalesByCountryReport`. What we need to do now is make sure that whenever we click a table header, data in the table either changes its sort order or is re-sorted by a new column. This will require a few changes to the `CountryTable` class:
 
 1. In the return statement of `CountryTable`'s `render()` method, add a new prop to the `TableCard` component that you return:
     ```javascript
     onSort={this.handleSort}
     ``` 
-    This tells the `TableCard` that whenever a sortable table header is clicked, it should invoke the `handleSort()` method defined in `CountryTable`. Well, it's not actually defined yet, so let's do that next.
+    This tells `TableCard` that whenever a sortable table header is clicked, it should invoke the `handleSort()` method defined in `CountryTable`. Well, it's not actually defined yet, so let's do that next.
     
 2. Insert a new method, `handleSort()`, into the `CountryTable` class:
     ```javascript
@@ -585,7 +596,7 @@ So far we've managed to apply the default sort order to the per-country data tha
     }
 
     ```
-   This is the method that we want to invoke whenever a sortable table header is clicked. The method receives one argument, which is a key for the header that was clicked, and it helps us identify which column the user wants to re-sort by. If table data is currently sorted by that column, we just reverse the sort order. If table data is currently sorted by a different column that than passed over to the method, we re-sort by the new column without changing the sort order. Finally, we save re-sorted data, current sort column and sort order to component state. When React detects that the state has been updated, it automatically re-renders the `CountryTable` component for us.
+   This is the method that we want to invoke whenever a sortable table header is clicked. The method receives one argument, which is a key for the header that was clicked, and it helps us identify which column the user wants to re-sort by. If table data is currently sorted by that column, we just reverse the sort order. If table data is currently sorted by a different column than that passed over to the method, we re-sort by the new column without changing the sort order. Finally, we save re-sorted data, current sort column and sort order to component state. When React detects that state has been updated, it automatically re-renders the `CountryTable` component for us.
    
 3. The `handleSort()` method calls another method, `changeSortOrder()`, which isn't currently defined, and we need to fix this. Insert the following new method into the `CountryTable` class:
     ```javascript
@@ -612,20 +623,20 @@ So far we've managed to apply the default sort order to the per-country data tha
         return header;
     }
     ```
-   This method locates the header of a column that data is currently sorted by, and assigns additional props, `defaultSort` and `defaultOrder`, to that header. At the same time, these two props are removed from headers of all other columns. This makes sure that the current sort column is properly highlighted, and its header properly indicates the current sort order. Now, let's just add a call to this method in the next step.
+   This method locates the header of a column that data is currently sorted by, and assigns additional properties, `defaultSort` and `defaultOrder`, to that header. At the same time, these two properties are removed from headers of all other columns. As a result, the current sort column gets highlighted, and its header properly indicates the current sort order. Now, let's just add a call to this method in the next step.
 
 6. In `CountryTable`'s `render()` method, locate the `tableData` const and its `headers` property. Replace the current value of the `headers` property (`this.props.headers`) with this:
     ```javascript
     this.props.headers.map(header => this.setHeaderSortOptions(header))
     ```
 
-At this point, we should be all set. After refreshing the page of our extension in your browser, try clicking column headers and see what happens. What you should see is data re-sorted, current sort column highlighted, and headers indicating what sort order is currently applied:
+At this point, we should be all set with re-sorting data. After refreshing the page of our extension in your browser, try clicking column headers and see what happens. What you should see is data re-sorted, current sort column highlighted, and sort order indicators in headers correctly displayed:
 
 ![Sorting in per-country table view](img/tablecard_sort.png)
 
 ### Fetching real data
 
-Our extension already looks nice &mdash; that is, until we realize we're still dealing with mock data. It's time to start writing code that will get us real, live data from our WooCommerce installation, and then transform the data to the format that we expect. Let's get started.
+Our extension already looks nice &mdash; that is, until we realize that we're still dealing with mock data. It's time to start writing code that will get us real, live data from our WooCommerce installation, and then transform the data to the format that we expect. Let's get started.
 
 1. In the constructor of `SalesByCountryReport`, select the entire statement that initializes `this.state`, and replace it with the following:
     ```javascript
@@ -638,13 +649,13 @@ Our extension already looks nice &mdash; that is, until we realize we're still d
     ```
    We have added and initialized two state properties:
    * `allCountries` will store all countries that our WooCommerce installation knows about. Since the set of countries isn't going to change, we will fetch it once, store it in this state property, and read it from there instead of re-fetching.
-   * `data.loading` will be used as a switch to tell React what to render: if data has not finished loading (`data.loading === true`), we want to display some kind of placeholder on our extension's page; if it has finished loading (`data.loading === false`), we want to display the final data.
+   * `data.loading` will be used as a switch to tell React what to render: if data has not finished loading (`data.loading === true`), we want to display some kind of placeholder on our extension's page; if it has finished loading (`data.loading === false`), we want to display the actual loaded data.
 
-2. In the following line in the constructor, insert another statement:
+2. In the next line in the constructor, insert another statement:
     ```javascript
     this.fetchData(this.state.dateQuery);
     ```
-   Since we no longer use mock data, we're calling the `fetchData()` method from the constructor to start fetching initial data when our component is loaded for the first time. The method is not defined yet, and our next step is to fix this.
+   Since we no longer use mock data, we're calling the `fetchData()` method from the constructor to start requesting initial data when our component is loaded for the first time. The method is not defined yet, and our next step is to fix this.
    
 3. Paste a new method into `SalesByCountryReport`:
     ```javascript
@@ -676,10 +687,10 @@ Our extension already looks nice &mdash; that is, until we realize we're still d
     }
     ```
    Let's see what's going on here:
-   * First, we make sure that the `data.loading` state property is set to `true`, which we'll use to show a placeholder while data is loading. This line won't be executed when the method is called from the constructor, because in this case `data.loading` is already set to `true`; however, we'll need this line later when we learn to update data when a new date range is selected.
-   * Next, we declare `endPoints` &mdash; an object that holds relative paths to the 3 [WooCommerce REST API](http://woocommerce.github.io/woocommerce-rest-api-docs/) endpoints that we'll use to fetch data. Since all these endpoints can return more data than we need, we append the [`_fields` query parameter](https://developer.wordpress.org/rest-api/using-the-rest-api/global-parameters/#_fields) to limit the data fields that are sent to our extension. 
-   * When URLs for our endpoints are ready, we start requesting them asynchronously using `Promise.all`, which will only let us proceed once responses to all requests have been received and the corresponding promises resolved. Note that a request to the `countries` endpoint is only sent if the countries are not yet saved to component state.
-   * As soon as all promises are resolved, the `prepareData()` method is called to transform data to a format we can use to populate our report. We'll declare `prepareData()` later.
+   * First, we make sure that the `data.loading` state property is set to `true`, which we'll use to show a placeholder while data is loading. This line won't be executed when the method is called from the constructor, because in this case `data.loading` is already set to `true`; however, we'll need this line later, as we learn to update data when a selected date range changes.
+   * Next, we declare `endPoints` &mdash; an object that holds relative paths to the 3 [WooCommerce REST API](http://woocommerce.github.io/woocommerce-rest-api-docs/) endpoints that we'll use to fetch data. Since all these endpoints can return more data than we need, we append the [`_fields` query parameter](https://developer.wordpress.org/rest-api/using-the-rest-api/global-parameters/#_fields) to limit the data fields that are sent to our extension.
+   * When URLs for our endpoints are ready, we start requesting them asynchronously using `Promise.all`, which will only let us proceed once responses to all requests have been received and the corresponding promises resolved. Note that a request to the `countries` endpoint is only sent if countries are not yet saved to component state.
+   * As soon as all promises are resolved, the `prepareData()` method transforms data to a format we can use to populate our report. We'll declare `prepareData()` later.
    * Whatever `prepareData()` returns is put into the component state, and when the state updates, React triggers re-rendering of the component with ready-to-use data.
 
 4. `fetchData` uses a method, `apiFetch`, from a library that we don't have installed yet. To fix this, run the following command in the root directory of our extension:
@@ -753,7 +764,7 @@ Our extension already looks nice &mdash; that is, until we realize we're still d
         });
     }
     ```
-   This method is called from `prepareData()`, and it maps each order to a specific country that the order was made from. To do this, it first gets a country code from a customer entry that matches a given customer ID, and then it finds the full country name by a given country code in the countries array. Some customers may not have country information in their profiles, and if that's the case, an order is tagged with "Unknown country".
+   This method is called from `prepareData()`, and it maps each order to a specific country that the order was made from. To do this, it first gets a country code from a customer entry that matches a given customer ID, and then it finds the full country name by a given country code in the `countries` array. Some customers may not have country information in their profiles, and if that's the case, an order is tagged with "Unknown country".
    
 9. Add (you guessed it) yet another method to `SalesByCountryReport`:
     ```javascript
@@ -820,7 +831,7 @@ Our extension already looks nice &mdash; that is, until we realize we're still d
         </Fragment>
     }
     ```
-    This revision of the return statement adds a condition whereby a set of components that hold data is only returned once data has finished loading. When data is still loading, only a short progress message is rendered. (Later, we will replace this quick progress message with a more professional looking set of placeholder components.)
+    This revision of the return statement adds a condition whereby a set of components that hold data is only returned once data has finished loading. While data is still loading, only a short progress message is rendered. (Later, we will replace this quick progress message with a more professional looking set of placeholder components.)
 
 12. Since we're no longer using mock data, scroll up to the imports section in `SalesByCountryReport`, and remove the line that imports `{mockData}`.
 
@@ -838,13 +849,13 @@ Granted, since this is live data, you'll see different numbers, and probably a d
 
 ### Updating data when a new date range is selected
 
-Fetching live data from REST API and displaying them in our report is a good start, but we don't currently have a working way to update the data when we select a new date range using the `ReportFilters` component. It's time to fix this.
+Fetching live data from REST API and displaying it in our report is a good start, but we don't currently have a working way to update the data when we select a new date range using the `ReportFilters` component. It's time to fix this.
 
 1. In `SalesByCountryReport`'s `render()` method, find where you're calling the `ReportFilters` component, and add a new prop to the call:
     ```javascript
     onDateSelect={this.handleDateChange}
     ```
-   We're telling `ReportFilters` to call `handleDateChange()` every time we select a new date range and click *Update*. Next, let's declare `handleDateChange()`.
+   We're telling `ReportFilters` to call `handleDateChange()` every time we select a new date range and click *Update*. Next, let's declare `handleDateChange()` itself.
    
 2. Add a new method to `SalesByCountryReport`:
     ```javascript
@@ -880,7 +891,7 @@ When data is loading, our extension currently says "Waiting...", and that's all 
     ```
    These are placeholder components for summary list, chart, and table that WooCommerce provides as part of its React component library. For the summary list placeholder, we specify how many summary blocks we want, for the chart we specify the desired height in pixels, and for the table we provide a caption and the same set of headers that we pass over to our `CountryTable` component. Note that before any of these components, we render the same `ReportFilters` that we use for loaded data. That's because it doesn't need to wait for new data: it already displays the new date range.
 
-When you refresh our extension's page in the browser, here's what you will now see while data is loading:
+When you refresh our extension's page in the browser, here's what you should see while data is loading:
 
 ![Native placeholder components](img/placeholders.png)
 
@@ -972,7 +983,7 @@ If we now refresh our extension's page in the browser, we should see something l
 
 #### Adding a custom tooltip
 
-Having a bird's-eye view of sales breakdown by country like this is useful, but still there's something missing. What is we want to see how much revenue came from a country represented by the 18th bar from the left? That's hard to do right now, and to make it easy, we need to implement a tooltip for the bar chart.
+Having a bird's-eye view of sales breakdown by country like this is useful, but still there's something missing. What if we want to see how much revenue came from a country represented by the 18th bar from the left? That's hard to do right now, and to make it easy, we need to implement a tooltip for the bar chart.
 
 1. Under `src\components`, create a new subdirectory, `CustomTooltip`. 
 
@@ -999,7 +1010,7 @@ Having a bird's-eye view of sales breakdown by country like this is useful, but 
         }
     }
     ```
-   This is a simple component that displays a tooltip with a date range, country name (passed in as `this.props.label`), and total sales (passed in as the first array item in `this.props.payload`). For style consistency, the component uses markup structure and styles taken from WooCommerce's own tooltips from out-of-the-box analytics reports.
+   This is a simple component that displays a tooltip with a date range, country name (passed in as `this.props.label`), and total sales (passed in as the first array item in `this.props.payload`). For style consistency, the component uses markup structure and styles taken from WooCommerce's own tooltips in out-of-the-box analytics reports.
 
 4. Go back to `CountryChart.js`, and add two new import statements:
     ```javascript
@@ -1007,7 +1018,7 @@ Having a bird's-eye view of sales breakdown by country like this is useful, but 
    import './CountryChart.scss'
     ```
 
-5. Scroll down to the `render()` method in `CountryChart`, and paste the following code as a nested component of `BarChart`, next to `XAxis`, `YAxis` and other nested components:
+5. Scroll down to the `render()` method in `CountryChart`, and paste the following code as a nested component of `BarChart`, next to `XAxis`, `YAxis`, and other nested components:
     ```javascript
     <Tooltip
         cursor={{fill: 'rgba(0, 0, 0, 0.1)'}}
@@ -1121,7 +1132,7 @@ If we refresh our extension's page in the browser, here's what we'll see:
 
 ![Restyled bar chart component](img/bar_chart_styled.png)
 
-This is much nicer! Background color, layout of the chart header, font properties used in chart labels, transparent ticks on the Y axis, line strokes in the grid: the new styles allow for much less contrast with the adjacent native components.
+This is much nicer! Background color, layout of the chart header, font properties used in chart labels, transparent ticks on the Y axis, line strokes in the grid: the new styles make the bar chart component way less contrasting when put next to native components.
 
 ### Finishing touches
 
@@ -1151,7 +1162,7 @@ Let's modify the table header to make it look consistent with the bar chart head
     className="table_top_countries"
     ```
 
-This should be enough to make the styles of the two headers consistent:
+This should be enough to make the styles of the two headers look alike:
 
 ![Table and bar chart header styles made consistent](img/header_styles_after.png)
 
@@ -1159,6 +1170,8 @@ Finally, let's get rid of something that we haven't used since it was generated:
 
 ### That's it!
 
-We have come a long way since facing the boilerplate extension code that WooCommerce helped us generate. What we have now is a fully functional WooCommerce extension that fetches and transforms WooCommerce store data via REST API, visualizes the data using both components provided by WooCommerce and third-party components, and has a near-native look and feel: 
+We have come a long way since facing the boilerplate extension code that WooCommerce helped us generate. What we have now is a fully functional WooCommerce extension that fetches and transforms WooCommerce store data via REST API, visualizes the data using components provided by WooCommerce, as well as third-party components, and has a near-native look and feel:
 
 ![Completed extension](img/complete.png)
+
+If you got stuck following along this tutorial, or if you're only interested in looking at the end result, check out the [full source code](https://github.com/gorohoroh/gorohoroh-wordpress-plugins/tree/master/wc-admin-sales-by-country) of this extension.
