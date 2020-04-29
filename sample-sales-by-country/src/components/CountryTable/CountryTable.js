@@ -1,6 +1,7 @@
 import {__} from '@wordpress/i18n';
 import {Component as ReactComponent} from '@wordpress/element';
 import {TableCard} from '@woocommerce/components';
+import './CountryTable.scss'
 
 export class CountryTable extends ReactComponent {
 
@@ -87,6 +88,7 @@ export class CountryTable extends ReactComponent {
         };
 
         return <TableCard
+            className="table_top_countries"
             title={__('Top Countries', 'wc-admin-sales-by-country')}
             rows={tableData.rows}
             headers={tableData.headers}
