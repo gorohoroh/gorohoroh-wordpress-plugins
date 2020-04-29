@@ -1,6 +1,37 @@
 # WC Admin Sales by Country
 
-A WooCommerce Admin extension that breaks down sales by country. Inspired by an existing reporting plugin, [Sales Report By Country for WooCommerce](https://href.li/?https://www.zorem.com/products/woocommerce-sales-report-by-country/). Integrates into WooCommerce's *Analytics* section. Uses WooCommerce's REST API and React components. Serves as a demo of WooCommerce Admin extensibility.
+This is a [WooCommerce](https://woocommerce.com/) extension that shows how store sales are distributed between countries. Inspired by an existing reporting plugin, [Sales Report By Country for WooCommerce](https://href.li/?https://www.zorem.com/products/woocommerce-sales-report-by-country/). Integrates into WooCommerce's *Analytics* section in WordPress admin area. Uses WooCommerce's REST API and React components. Serves as a demo of a new JavaScript and React based extensibility model introduced by [WooCommerce Admin](https://wordpress.org/plugins/woocommerce-admin/).
+
+## System requirements
+
+* WordPress 5.3 or later.
+* WooCommerce 4.0 or later.
+
+## Installation and usage
+
+1. Download the [latest release](https://github.com/gorohoroh/gorohoroh-wordpress-plugins/release) as a zip archive.
+
+2. Extract the archive to your WordPress installation's *wp-content/plugins* directory.
+
+3. In the admin area of your WordPress installation, go to *Plugins | Install Plugins*, locate the extension called `wc-admin-sales-by-country`, and click *Activate*.
+
+4. In the admin area of your WordPress installation, go to *Analytics | Sales by Country*.
+
+## Development
+
+If you are looking to set up a local development environment for the source code of this plugin, here are the steps you need to take:
+
+1. Make sure that your local development environment meets the requirements [listed here](https://github.com/gorohoroh/gorohoroh-wordpress-plugins/blob/master/wc-admin-sales-by-country/tutorial/tutorial-sales_by_country.md#what-youll-need).
+
+2. Clone this repository to your local WordPress installation's *wp-content/plugins* directory.
+
+3. In the admin area of your WordPress installation, go to *Plugins | Install Plugins*, locate the extension called `wc-admin-sales-by-country`, and click *Activate*.
+
+4. In the root directory of this plugin (`{your_WordPress_installation}/wp-content/plugins/wc-admin-sales-by-country/`), run `npm install && npm start`.
+
+5. In the admin area of your WordPress installation, go to *Analytics | Sales by Country* to open that report that this plugin adds.
+
+You can now start editing source code in your working copy of this repository. JavaScript and Scss will be built automatically as you make changes, and these changes will be reflected in the plugin's report page.
 
 ## Tasks
 * :white_check_mark: Add plugin page to WP menu.
@@ -30,7 +61,7 @@ A WooCommerce Admin extension that breaks down sales by country. Inspired by an 
 * Add doc comments to functions.
 * Review to follow WordPress coding standards.
 * :white_check_mark: Internationalize.
-* Refactor for readability.
+* :white_check_mark: Refactor for readability.
 * Cover with tests.
-* Extend this README with install/activate/build instructions.
-* Write a guide to document how you got there.
+* :white_check_mark: Extend this README with install/activate/build instructions.
+* :white_check_mark: Write a [guide](tutorial/tutorial-sales_by_country.md) to document how you got there.
