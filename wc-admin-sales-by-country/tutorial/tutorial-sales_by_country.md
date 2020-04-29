@@ -47,7 +47,7 @@ By the end of the tutorial, the resulting extension should look like this:
 
 To illustrate the new extensibility model driven by WooCommerce Admin, let's take an existing WooCommerce extension that makes heavy use of data visualization, and see how we can create something similar using JavaScript and React.
 
-The extension that we're going to take inspiration from is [Sales Report By Country for WooCommerce](https://www.zorem.com/products/woocommerce-sales-report-by-country/). The extension adds an additional report tab that breaks down sales by country. It's available in WooCommerce's legacy *Reports* view (*WP-Admin | WooCommerce | Reports*), and looks like this:
+The extension that we're going to take inspiration from is [Sales Report By Country for WooCommerce](https://www.zorem.com/products/woocommerce-sales-report-by-country/). The extension adds a new report tab that breaks down sales by country. It's available in WooCommerce's legacy *Reports* view (*WP-Admin | WooCommerce | Reports*), and looks like this:
 
 ![Sales by Country extension](img/woo_sales_by_country.png)
 
@@ -55,7 +55,7 @@ Let's break the extension down to individual components. It provides:
 * A date range selector.
 * An area to display total sales, orders and countries for a selected date range.
 * A leaderboard-style table representing top 10 countries where orders from a selected date range are coming from.
-* Country and region selectors that help focus on one or multiple countries or regions. Each of the selectors accepts multiple filters.
+* Country and region selectors that help focus on one or more countries or regions. Each of the selectors accepts multiple filters.
 * A chart area to visualize data based on selected filters.
 * Chart type controls. By default, a bar chart is used for visualization, but you can opt to use a line chart or a pie chart instead.
 * Export to CSV.
@@ -179,7 +179,7 @@ Let's add our extension to this navigation system right away. This is done on th
     ```
 For more information about this filter, see [Extending Reports](https://github.com/woocommerce/woocommerce-admin/tree/fe7b6cca7a095d1a39043bd1b38fc055cf0b121d/client/analytics/report#extending-reports) in WooCommerce Admin documentation.
 
-After refreshing our report's page in WordPress admin, we now should see the breadcrumbs navigation area correctly populated with the path to the report and its title:
+After refreshing our report's page in WordPress admin, we should see the breadcrumbs navigation area correctly populated with the path to the report and its title:
 
 ![Breadcrumbs navigation for an extension](img/breadcrumbs_with_sales_by_country.png)
 
@@ -199,7 +199,7 @@ Now that we've discussed available React components, let's extract our main comp
 
 1. In the `src` directory that contains JavaScript code for our extension, create a new subdirectory, `components`.
 
-2. Under `components`, create another new subdirectory, `SalesByCountryReport`. This is where the main React component of our extension will reside. 
+2. Under `components`, create another new subdirectory, `SalesByCountryReport`. This is where we will develop the main React component of our extension. 
 
 3. Under `SalesByCountryReport`, create a new JavaScript file, `SalesByCountryReport.js`.
 
@@ -287,7 +287,7 @@ Before we move on to fetch real data from WooCommerce REST API, let's use mock d
     import {mockData} from '../../mockData';
     ```
 
-4. Add a constructor method to the `SalesByCountryReport` class:
+4. Add a constructor to the `SalesByCountryReport` class:
     ```javascript
     constructor(props) {
         super(props);
@@ -300,11 +300,11 @@ Before we move on to fetch real data from WooCommerce REST API, let's use mock d
     ```
    Now, whenever WooCommerce loads our `SalesByCountryReport` component, its state will be initialized with the imported mock data.
 
-Speaking of state, there are multiple **approaches to state management** in React: the regular [React state](https://reactjs.org/docs/state-and-lifecycle.html) in class components, the [state hook](https://reactjs.org/docs/hooks-state.html) in function components, [Redux](https://redux.js.org/), as well as the more WordPress-specific [@wordpress/data](https://developer.wordpress.org/block-editor/packages/packages-data/). We're going to use the regular React state for the sake of simplicity, although in larger applications, this approach is arguably not ideal in terms of maintainability and separation of concerns.
+Speaking of state, there are several **approaches to state management** in React: the regular [React state](https://reactjs.org/docs/state-and-lifecycle.html) in class components, the [state hook](https://reactjs.org/docs/hooks-state.html) in function components, [Redux](https://redux.js.org/), as well as the more WordPress-specific [@wordpress/data](https://developer.wordpress.org/block-editor/packages/packages-data/). We're going to use the regular React state for the sake of simplicity, although in larger applications, this approach is arguably not ideal in terms of maintainability and separation of concerns.
 
 ### Adding a date range selector
 
-Let's start populating our main component, `SalesByCountryReport`, with other components that will make up our extension's UI. We'll start with WooCommerce's standard [`ReportFilters` component](https://woocommerce.github.io/woocommerce-admin/#/components/packages/filters/README) that is used in out-of-the-box analytics reports to select a date range. This component is trivial to render and requires no customization, but it does require a few props to be passed to it, and to do that, we'll need to lay some groundwork.
+Let's start populating our main component, `SalesByCountryReport`, with other components that will make up our extension's UI. We'll start with WooCommerce's standard [`ReportFilters` component](https://woocommerce.github.io/woocommerce-admin/#/components/packages/filters/README) that out-of-the-box analytics reports use to select a date range. This component is trivial to render and requires no customization, but it does require a few props to be passed to it, and to do that, we'll need to lay some groundwork.
 
 #### The groundwork
 
@@ -525,7 +525,7 @@ What happens when we click a header? Well, nothing, because we haven't implement
 
 ##### Applying the default sort order
 
-The way per-country data is sorted in our table sounds like something that the table itself should be responsible for. If so, we need a way for the table to store data sorted in a particular way. For that, we'll need to add state to the `CountryTable` component, and initialize the state in a constructor.
+Sorting per-country data in our table is probably something that the table itself should be responsible for. If so, we need a way for the table to store data sorted in a particular way. For that, we'll need to add state to the `CountryTable` component, and initialize the state in a constructor.
 
 1. In the `CountryTable` class, add the following constructor:
     ```javascript
@@ -544,7 +544,7 @@ The way per-country data is sorted in our table sounds like something that the t
         }
     }
     ``` 
-    In the constructor, we define sorting defaults: when rendering the table initially, we want it sorted by absolute sales (`defaultSortColumn`) in descending order (`defaultSortOrder`). Next, we call a `sort()` method (which is yet to be implemented) and pass these defaults along with the data received as props from our main component. Finally, we save the resulting sorted data along with applied sort and order options to a state object. Now, let's implement the sorting method.
+    In the constructor, we define sorting defaults: when rendering the table initially, we want it sorted by absolute sales (`defaultSortColumn`) in descending order (`defaultSortOrder`). Next, we call a `sort()` method (which is yet to be defined) and pass these defaults along with the data received as props from our main component. Finally, we save the resulting sorted data along with applied sort and order options to a state object. Now, let's implement the sorting method.
 
 2. Add the following method to the `CountryTable` class:
     ```javascript
@@ -973,7 +973,7 @@ As you may recall, native chart components provided by WooCommerce are limited i
    * This is a stateless component, and it only has one method: `render()`.
    * Before returning anything from `render()`, we transform the incoming array of country data into a format that our bar chart component understands. Then, we sort the resulting array by absolute sales, and save it into the `chartData` constant.
    * In the return statement, we check if `chartData` contains data for at least one country, and if it does, we visualize the data using the [`BarChart` component](https://recharts.org/en-US/api/BarChart) imported from Recharts. If `chartData` is empty, we instead show a message indicating that there's no data for a selected date range.
-   * Note the `YAxis` component that is nested within `BarChart`. It receives a prop called `domain` that defines the range of possible values plotted on the Y axis. Since we want to leave some space between the highest bar in our chart and the chart's upper boundary, we take the maximum data point in `chartData`, multiply it by 1.05, and round down to an integer.
+   * Note the `YAxis` component that is nested within `BarChart`. It receives a prop called `domain` that defines the range of possible values plotted on the Y axis. Since we want to leave some space between the highest bar in our chart and the chart's upper boundary, we take the largest data point in `chartData`, multiply it by 1.05, and round down to an integer.
    * The `BarChart` component is wrapped in another Recharts component, `ResponsiveContainer`, that helps the bar chart adapt to various screen sizes.
    * `ResponsiveContainer` is wrapped in a cascade of `div` elements that use classes from WooCommerce's own spreadsheets. This helps make our component feel as consistent with native components as possible.
    
@@ -1136,7 +1136,7 @@ This is much nicer! Background color, layout of the chart header, font propertie
 
 ### Finishing touches
 
-We're nearly done, and there's only one minor thing left to do. Our bar chart and our table both have headers, and the styles of these headers currently look very different:
+We're almost done, and there's only one minor thing left to do. Our bar chart and our table both have headers, and the styles of these headers currently look very different:
 
 ![Table and bar chart header styles](img/header_styles_before.png)
 
