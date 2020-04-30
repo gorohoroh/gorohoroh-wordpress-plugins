@@ -58,7 +58,7 @@ You can now start editing source code in your working copy of this repository. J
 * `SalesByCountryReport.handleDateChange()`: compare date ranges in old and new queries; don't fetch if they're equal, or if a date range in the new query is within the date range in the old query.
 * :white_check_mark: `SalesByCountryReport.fetchData()`: fetch all countries once, add them to state, then read from the state instead of fetching again.
 * :white_check_mark: `TablePlaceholder`, `CountryTable`: reuse headers
-* Add doc comments to functions.
+* :white_check_mark: Add doc comments to functions.
 * Review to follow WordPress coding standards.
 * :white_check_mark: Internationalize.
 * :white_check_mark: Refactor for readability.
