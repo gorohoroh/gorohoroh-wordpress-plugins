@@ -28,18 +28,27 @@ export class SalesByCountryReport extends ReactComponent {
         this.fetchData(this.state.dateQuery);
     }
 
+    /**
+     * Parses a query and returns an object representing a date query that is used to handle date range changes.
+     */
     createDateQuery(query) {
         const {period, compare, before, after} = getDateParamsFromQuery(query);
         const {primary: primaryDate, secondary: secondaryDate} = getCurrentDates(query);
         return {period, compare, before, after, primaryDate, secondaryDate};
     }
 
+    /**
+     * Given a date query, returns a set of URL-encoded concatenated query parameters, including start and end dates with timestamps.
+     */
     getQueryParameters(dateQuery) {
         const afterDate = encodeURIComponent(appendTimestamp(dateQuery.primaryDate.after, "start"));
         const beforeDate = encodeURIComponent(appendTimestamp(dateQuery.primaryDate.before, "end"));
         return `&after=${afterDate}&before=${beforeDate}&interval=day&order=asc&per_page=100&_locale=user`;
     }
 
+    /**
+     * Sends data requests to WooCommerce REST API endpoints, initiates processing of the data returned from the endpoints, then updates component state with the resulting data.
+     */
     fetchData(dateQuery) {
 
         if(!this.state.data.loading) this.setState({data: {loading: true}});
@@ -67,6 +76,9 @@ export class SalesByCountryReport extends ReactComponent {
             .catch(err => console.log(err));
     }
 
+    /**
+     * Transforms data received from REST API endpoints to a format suitable for saving into component state.
+     */
     prepareData(countries, orders, customers) {
         let data;
 
@@ -101,6 +113,9 @@ export class SalesByCountryReport extends ReactComponent {
         return data;
     }
 
+    /**
+     * Takes an array of orders with information on which countries they were made from, and transforms it into an array of countries. For each country, calculates totals for sales and orders.
+     */
     getPerCountryData(ordersWithCountries) {
         return ordersWithCountries.reduce((accumulator, currentObject) => {
             const countryCode = currentObject['country_code'];
@@ -127,6 +142,9 @@ export class SalesByCountryReport extends ReactComponent {
         }, {});
     }
 
+    /**
+     * Given an array of orders, looks up the full country name for each order and saves it to a new field.
+     */
     getOrdersWithCountries(orders, customers, countries) {
         return orders.map(order => {
             order.country_code = customers.find(item => item.id === order.customer_id).country;
@@ -138,11 +156,17 @@ export class SalesByCountryReport extends ReactComponent {
         });
     }
 
+    /**
+     * Calculates the total for a given numerical property (such as sales or orders), and returns it after rounding.
+     */
     getTotalNumber(data, property) {
         const propertyTotal = data.reduce((accumulator, currentObject) => accumulator + currentObject[property], 0);
         return Math.round(propertyTotal * 100) / 100;
     }
 
+    /**
+     * When a new date range is selected in the ReportFilters component, initiates a new set of REST API data requests to get data for the new date range.
+     */
     handleDateChange(newQuery) {
         const newDateQuery = this.createDateQuery(newQuery);
         this.setState({dateQuery: newDateQuery});

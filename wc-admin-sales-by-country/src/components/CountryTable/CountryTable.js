@@ -22,10 +22,16 @@ export class CountryTable extends ReactComponent {
         }
     }
 
+    /**
+     * Switches between ascending and descending sort orders.
+     */
     changeSortOrder(order) {
         return order === "asc" ? "desc" : "asc";
     }
 
+    /**
+     * Assigns properties to table column headers so that the current sort column is highlighted, and its header indicates the current sort order.
+     */
     setHeaderSortOptions(header) {
         if (header.key === this.state.sortColumn) {
             header.defaultSort = true;
@@ -37,6 +43,9 @@ export class CountryTable extends ReactComponent {
         return header;
     }
 
+    /**
+     * Sorts an array representing table data by a given table column in a given order.
+     */
     sort(data, column, sortOrder) {
         const appliedSortOrder = sortOrder === "asc" ? 1 : -1;
         return data.sort((a, b) => {
@@ -46,6 +55,9 @@ export class CountryTable extends ReactComponent {
         });
     }
 
+    /**
+     * When a sortable table column header is clicked, if table data is already sorted by that column, reverses the sort order; if table data is currently sorted by a different column, re-sorts by the new column without changing the sort order.
+     */
     handleSort(newSortColumn) {
         let {countryData, sortColumn, sortOrder} = this.state;
 
