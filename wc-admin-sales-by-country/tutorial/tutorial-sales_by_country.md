@@ -8,18 +8,22 @@ If you've missed prior talk about this new JavaScript-focused experience that ha
 * [Integrating The New WooCommerce Navigation Bar](https://woocommerce.wordpress.com/2020/02/27/integrating-the-new-woocommerce-navigation-bar/)
 * [WooCommerce Admin Components](https://woocommerce.github.io/woocommerce-admin/#/components/)
 
-In this tutorial, we'll take a closer look at this new extensibility model. We're going to walk through the process of creating a **fully functional WooCommerce extension** that displays an independent analytics report, gets data from **WooCommerce REST API**, processes the data using JavaScript, gets a native look and feel by using a set of WooCommerce's own **library of React components**, integrates a **third-party component** when native components aren't enough, and gets by with only 60 lines of PHP code, of which 35 are generated.
+In this tutorial, we'll take a closer look at this new extensibility model. We're going to walk through the process of creating a **fully functional WooCommerce extension** that displays an independent analytics report, gets data from the **WooCommerce REST API**, processes the data using JavaScript, gets a native look and feel by using a set of WooCommerce's own **library of React components**, integrates a **third-party component** when native components aren't enough, and gets by with only 60 lines of PHP code, of which 35 are generated.
 
 By the end of the tutorial, the resulting extension should look like this:
 
 ![The resulting extension](img/expected_outcome.png)
+
+Full disclosure: this is a *long* tutorial. If you don't feel like following along, feel free to check out the [source code](https://github.com/gorohoroh/gorohoroh-wordpress-plugins/tree/master/wc-admin-sales-by-country) of the resulting extension.
+
+If you're ready to follow along, fasten your seatbelts, and let's see exactly what's ahead:
 
 - [What we're going to do](#what-were-going-to-do)
 - [What you'll need](#what-youll-need)
 - [Preparing to get started](#preparing-to-get-started)
 - [Creating a standalone report](#creating-a-standalone-report)
   * [Scaffolding with the starter pack](#scaffolding-with-the-starter-pack)
-  * [Making the extension discoverable via WordPress admin sidebar](#making-the-extension-discoverable-via-wordpress-admin-sidebar)
+  * [Making the extension discoverable via WordPress Admin sidebar](#making-the-extension-discoverable-via-wordpress-admin-sidebar)
   * [Integrating the extension into WooCommerce's own breadcrumbs navigation](#integrating-the-extension-into-woocommerces-own-breadcrumbs-navigation)
 - [Exploring available React components](#exploring-available-react-components)
 - [Extracting the extension's main React component to a separate file](#extracting-the-extensions-main-react-component-to-a-separate-file)
@@ -47,18 +51,18 @@ By the end of the tutorial, the resulting extension should look like this:
 
 To illustrate the new extensibility model driven by WooCommerce Admin, let's take an existing WooCommerce extension that makes heavy use of data visualization, and see how we can create something similar using JavaScript and React.
 
-The extension that we're going to take inspiration from is [Sales Report By Country for WooCommerce](https://www.zorem.com/products/woocommerce-sales-report-by-country/). The extension adds a new report tab that breaks down sales by country. It's available in WooCommerce's legacy *Reports* view (*WP-Admin | WooCommerce | Reports*), and looks like this:
+The extension that we're going to take inspiration from is [Sales Report By Country for WooCommerce](https://www.zorem.com/products/woocommerce-sales-report-by-country/). The extension adds a new report tab that breaks down sales by country. It's available in WooCommerce's legacy *Reports* view (*WP-Admin > WooCommerce > Reports*), and looks like this:
 
 ![Sales by Country extension](img/woo_sales_by_country.png)
 
 Let's break the extension down to individual components. It provides:
-* A date range selector.
-* An area to display total sales, orders and countries for a selected date range.
-* A leaderboard-style table representing top 10 countries where orders from a selected date range are coming from.
-* Country and region selectors that help focus on one or more countries or regions. Each of the selectors accepts multiple filters.
-* A chart area to visualize data based on selected filters.
-* Chart type controls. By default, a bar chart is used for visualization, but you can opt to use a line chart or a pie chart instead.
-* Export to CSV.
+1. A date range selector.
+2. An area to display total sales, orders and countries for a selected date range.
+3. A leaderboard-style table representing top 10 countries where orders from a selected date range are coming from.
+4. Country and region selectors that help focus on one or more countries or regions. Each of the selectors accepts multiple filters.
+5. A chart area to visualize data based on selected filters.
+6. Chart type controls. By default, a bar chart is used for visualization, but you can opt to use a line chart or a pie chart instead.
+7. Export to CSV.
 
 We will not necessarily try to implement all of these features, but we'll see how far we can go.
 
@@ -103,22 +107,22 @@ Here's how to generate boilerplate code for a new extension using the starter pa
     add_action( 'admin_enqueue_scripts', 'add_sample_sales_by_country_register_script' );
     ```
 
-5. Go to the admin area of your local WordPress installation, locate the new extension under *Plugins | Install Plugins*, and activate it.
+5. Go to the admin area of your local WordPress installation, locate the new extension under *Plugins > Installed Plugins*, and activate it.
 
-#### Making the extension discoverable via WordPress admin sidebar
+#### Making the extension discoverable via WordPress Admin sidebar
 
-Our extension is now live but it doesn't do anything. Let's start by making it discoverable in the section of WordPress Admin that WooCommerce uses.
+Our extension is now active but it doesn't do anything. Let's start by making it discoverable in the section of WordPress Admin (a.k.a. WP Admin) that WooCommerce uses.
 
-First, let's add a link to the extension's page to WordPress Admin's sidebar. All WooCommerce reports powered by WooCommerce Admin are available under the *Analytics* group, so we'll add our extension there as well. To do this, we'll need to hook into a backend filter called `woocommerce_analytics_report_menu_items`.
+First, let's add a link to the extension's page to WP Admin's sidebar. All WooCommerce reports powered by WooCommerce Admin are available under the *Analytics* group, so we'll add our extension there as well. To do this, we'll need to hook into a backend filter called `woocommerce_analytics_report_menu_items`.
 
 1. Open our extension's main PHP file, `sample-sales-by-country.php`.
 
 2. Add the following code to the end of the file:
 
     ```php
-    add_filter('woocommerce_analytics_report_menu_items', 'add_sample_sales_by_country_to_analytics_menu');
+    add_filter( 'woocommerce_analytics_report_menu_items', 'add_sample_sales_by_country_to_analytics_menu' );
     
-    function add_sample_sales_by_country_to_analytics_menu($report_pages) {
+    function add_sample_sales_by_country_to_analytics_menu( $report_pages ) {
         $report_pages[] = array(
             'id' => 'sample-sales-by-country',
             'title' => __('Sales by Country', 'sample-sales-by-country'),
@@ -132,11 +136,11 @@ First, let's add a link to the extension's page to WordPress Admin's sidebar. Al
 
 This will add our extension's page to the [list of pages](https://github.com/woocommerce/woocommerce-admin/blob/fe7b6cca7a095d1a39043bd1b38fc055cf0b121d/src/Features/Analytics.php#L77) that WooCommerce Admin's `Analytics` class registers with WordPress to show under its *Analytics* page group in the sidebar. Once you refresh the admin view of your local WordPress installation, you should be able to see our extension, "Sales by Country", listed in the sidebar under *Analytics*:
 
-![Our extension's entry in WordPress Admin's sidebar, under WooCommerce's Analytics](img/wp-admin-wc-analytics-menu-item.png)
+![Our extension's entry in WP Admin sidebar, under WooCommerce Analytics](img/wp-admin-wc-analytics-menu-item.png)
 
 #### Integrating the extension into WooCommerce's own breadcrumbs navigation
 
-When WooCommerce 4 integrates into WordPress admin area, it creates a breadcrumbs navigation system that tries to glue together WooCommerce pages that are somewhat scattered across the admin area:
+When WooCommerce 4 integrates into WP Admin, it creates a breadcrumbs navigation system that tries to glue together WooCommerce pages that are somewhat scattered across the admin area:
 
 ![WooCommerce breadcrumbs navigation](img/wc_breadcrumbs_navigation_area.png)
 
@@ -146,7 +150,7 @@ Let's add our extension to this navigation system right away. This is done on th
     ```shell script
     npm install @wordpress/hooks @wordpress/i18n @woocommerce/components
     ```
-2. Open our extension's entry JavaScript file, `src\index.js`.
+2. Open our extension's entry JavaScript file, `src/index.js`.
 
 3. Remove all existing code from `index.js`.  
 
@@ -179,7 +183,7 @@ Let's add our extension to this navigation system right away. This is done on th
     ```
 For more information about this filter, see [Extending Reports](https://github.com/woocommerce/woocommerce-admin/tree/fe7b6cca7a095d1a39043bd1b38fc055cf0b121d/client/analytics/report#extending-reports) in WooCommerce Admin documentation.
 
-After refreshing our report's page in WordPress admin, we should see the breadcrumbs navigation area correctly populated with the path to the report and its title:
+After refreshing our report's page in WP Admin, we should see the breadcrumbs navigation area correctly populated with the path to the report and its title:
 
 ![Breadcrumbs navigation for an extension](img/breadcrumbs_with_sales_by_country.png)
 
@@ -203,9 +207,9 @@ Now that we've discussed available React components, let's extract our main comp
 
 3. Under `SalesByCountryReport`, create a new JavaScript file, `SalesByCountryReport.js`.
 
-4. Open our extension's entry JavaScript file, `src\index.js`. Select and cut the stub React component that you created earlier, along with the import statement for `ReactComponent`:
+4. Open our extension's entry JavaScript file, `src/index.js`. Select and cut the stub React component that you created earlier, along with the import statement for `ReactComponent`:
     ```javascript
-   // src\index.js
+   // src/index.js
     import {Component as ReactComponent} from '@wordpress/element';
     
     export class SalesByCountryReport extends ReactComponent {
@@ -215,7 +219,7 @@ Now that we've discussed available React components, let's extract our main comp
 
 5. Go back to `SalesByCountryReport.js`, and paste the stub component and the import statement.
 
-6. Return to the entry file, `src\index.js`, and add a statement to import the extracted component:
+6. Return to the entry file, `src/index.js`, and add a statement to import the extracted component:
     ```javascript
     import {SalesByCountryReport} from "./components/SalesByCountryReport/SalesByCountryReport";
     ```
@@ -349,7 +353,7 @@ Now that the groundwork is complete, let's finally add a date range selector to 
         </Fragment>
     }
     ```
-   This is our actual date range selector, a.k.a the `ReportFilters` component, that React will render into the DOM whenever our main component, `SalesByCountryReport`, is initialized or updated. It takes quite a few props: some passed through directly from the main component, some coming from the main component's state (we'll get to this next). If you're wondering what the `Fragment` component is, it's just a way to [group multiple elements](https://reactjs.org/docs/fragments.html) returned by the `render()` method. Finally, the reason why we've extracted `ReportFilters` to a variable is that we'll later need to return this component both for the final UI and for placeholder UI while data is loading.
+   This is our actual date range selector, a.k.a. the `ReportFilters` component, that React will render into the DOM whenever our main component, `SalesByCountryReport`, is initialized or updated. It takes quite a few props: some passed through directly from the main component, some coming from the main component's state (we'll get to this next). If you're wondering what the `Fragment` component is, it's just a way to [group multiple elements](https://reactjs.org/docs/fragments.html) returned by the `render()` method. Finally, the reason why we've extracted `ReportFilters` to a variable is that we'll later need to return this component both for the final UI and for placeholder UI while data is loading.
 
 2. Replace the existing `constructor()` method of the `SalesByCountryReport` class with the following:
     ```javascript
@@ -459,7 +463,7 @@ Since `TableCard` requires quite a lot of configuration to define table headers,
     ```
    This is how we render our `CountryTable` component. It's still not declared though, so let's do this.
 
-4. Under `src\components`, create a new subdirectory, `CountryTable`. 
+4. Under `src/components`, create a new subdirectory, `CountryTable`. 
 
 5. Under `CountryTable`, create a new JavaScript file, `CountryTable.js`.
 
@@ -926,7 +930,7 @@ As you may recall, native chart components provided by WooCommerce are limited i
     ```
    This is all we need to do in our main component, `SalesByCountryReports`, and it's now time to actually create the chart component that we have already imported and called.
    
-5. Under `src\components`, create a new subdirectory, `CountryChart`. 
+5. Under `src/components`, create a new subdirectory, `CountryChart`. 
 
 6. Under `CountryChart`, create a new JavaScript file, `CountryChart.js`.
 
@@ -985,7 +989,7 @@ If we now refresh our extension's page in the browser, we should see something l
 
 Having a bird's-eye view of sales breakdown by country like this is useful, but still there's something missing. What if we want to see how much revenue came from a country represented by the 18th bar from the left? That's hard to do right now, and to make it easy, we need to implement a tooltip for the bar chart.
 
-1. Under `src\components`, create a new subdirectory, `CustomTooltip`. 
+1. Under `src/components`, create a new subdirectory, `CustomTooltip`. 
 
 2. Under `CustomTooltip`, create a new JavaScript file, `CustomTooltip.js`.
 
@@ -1032,7 +1036,7 @@ Having a bird's-eye view of sales breakdown by country like this is useful, but 
     ```
    `Tooltip` is Recharts' own tooltip component that allows to customize its content with the `content` prop. This prop receives a function that checks if the tooltip is currently active (that is, if the user has hovered over a bar in the chart), and if it is, it displays our own custom tooltip that we have just created and imported.
    
-6. Under `src\components\CountryChart`, create a new Scss stylesheet, `CountryChart.scss`.
+6. Under `src/components/CountryChart`, create a new Scss stylesheet, `CountryChart.scss`.
 
 7. Open `CountryChart.scss`, and paste the following styles:
     ```scss
@@ -1142,7 +1146,7 @@ We're almost done, and there's only one minor thing left to do. Our bar chart an
 
 Let's modify the table header to make it look consistent with the bar chart header:
 
-1. Go to `src\components\CountryTable`, and create a new Scss stylesheet, `CountryTable.scss`.
+1. Go to `src/components/CountryTable`, and create a new Scss stylesheet, `CountryTable.scss`.
 
 2. Open `CountryTable.scss`, and paste the following styles:
     ```scss
@@ -1166,7 +1170,7 @@ This should be enough to make the styles of the two headers look alike:
 
 ![Table and bar chart header styles made consistent](img/header_styles_after.png)
 
-Finally, let's get rid of something that we haven't used since it was generated: under `src\components`, delete the empty `index.scss` stylesheet.
+Finally, let's get rid of something that we haven't used since it was generated: under `src/components`, delete the empty `index.scss` stylesheet.
 
 ### That's it!
 

@@ -41,7 +41,7 @@ function add_wc_admin_sales_by_country_register_script() {
 	wp_enqueue_style( 'wc-admin-sales-by-country' );
 }
 
-function add_to_analytics_menu($report_pages) {
+function add_to_analytics_menu( $report_pages ) {
 
     $report_pages[] = array(
         'id' => 'wc-admin-sales-by-country',
@@ -53,10 +53,10 @@ function add_to_analytics_menu($report_pages) {
     return $report_pages;
 }
 
-add_action('admin_enqueue_scripts', 'add_wc_admin_sales_by_country_register_script');
+add_action( 'admin_enqueue_scripts', 'add_wc_admin_sales_by_country_register_script' );
 
-add_filter('woocommerce_analytics_report_menu_items', 'add_to_analytics_menu');
+add_filter( 'woocommerce_analytics_report_menu_items', 'add_to_analytics_menu' );
 
-add_action('init', function () {
-    wp_set_script_translations('wc-admin-sales-by-country', 'wc-admin-sales-by-country');
+add_action( 'init', function () {
+    wp_set_script_translations( 'wc-admin-sales-by-country', 'wc-admin-sales-by-country' );
 });
