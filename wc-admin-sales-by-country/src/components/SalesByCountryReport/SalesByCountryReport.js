@@ -177,12 +177,12 @@ export class SalesByCountryReport extends ReactComponent {
 
         const reportFilters =
             <ReportFilters
-            dateQuery={this.state.dateQuery}
-            query={this.props.query}
-            path={this.props.path}
-            currency={this.state.currency}
-            isoDateFormat={isoDateFormat}
-            onDateSelect={this.handleDateChange}/>;
+            dateQuery={ this.state.dateQuery }
+            query={ this.props.query }
+            path={ this.props.path }
+            currency={ this.state.currency }
+            isoDateFormat={ isoDateFormat }
+            onDateSelect={ this.handleDateChange } />;
 
         const tableHeaders = [
             {key: 'country', label: __("Country", "wc-admin-sales-by-country"), isLeftAligned: true, isSortable: true, required: true},
@@ -194,37 +194,37 @@ export class SalesByCountryReport extends ReactComponent {
 
         if (this.state.data.loading) {
             return <Fragment>
-                {reportFilters}
-                <SummaryListPlaceholder numberOfItems={3}/>
-                <ChartPlaceholder height={300}/>
-                <TablePlaceholder caption={__("Top Countries", "wc-admin-sales-by-country")}
-                                  headers={tableHeaders}/>
+                { reportFilters }
+                <SummaryListPlaceholder numberOfItems={ 3 } />
+                <ChartPlaceholder height={ 300 } />
+                <TablePlaceholder caption={ __("Top Countries", "wc-admin-sales-by-country") }
+                                  headers={ tableHeaders } />
             </Fragment>
         } else {
             const {data, currency, dateQuery} = this.state;
 
             return <Fragment>
-                {reportFilters}
+                { reportFilters }
                 <SummaryList>
-                    {() => [
+                    { () => [
                         <SummaryNumber key="sales"
-                                       value={currency.render(data.totals.total_sales)}
-                                       label={__("Total Sales", "wc-admin-sales-by-country")}/>,
+                                       value={ currency.render(data.totals.total_sales) }
+                                       label={ __("Total Sales", "wc-admin-sales-by-country") } />,
                         <SummaryNumber key="countries"
-                                       value={data.totals.countries}
-                                       label={__("Countries", "wc-admin-sales-by-country")}/>,
+                                       value={ data.totals.countries }
+                                       label={ __("Countries", "wc-admin-sales-by-country") } />,
                         <SummaryNumber key="orders"
-                                       value={data.totals.orders}
-                                       label={__("Orders", "wc-admin-sales-by-country")}/>
-                    ]}
+                                       value={ data.totals.orders }
+                                       label={ __("Orders", "wc-admin-sales-by-country") } />
+                    ] }
                 </SummaryList>
-                <CountryChart chartData={data.countries}
-                              dateRange={dateQuery.primaryDate.range}
-                              currency={currency}/>
-                <CountryTable countryData={data.countries}
-                              totals={data.totals}
-                              currency={currency}
-                              headers={tableHeaders}/>
+                <CountryChart chartData={ data.countries }
+                              dateRange={ dateQuery.primaryDate.range }
+                              currency={ currency } />
+                <CountryTable countryData={ data.countries }
+                              totals={ data.totals }
+                              currency={ currency }
+                              headers={ tableHeaders } />
             </Fragment>
         }
     }

@@ -101,13 +101,13 @@ export class CountryTable extends ReactComponent {
 
         return <TableCard
             className="table_top_countries"
-            title={__("Top Countries", "wc-admin-sales-by-country")}
-            rows={tableData.rows}
-            headers={tableData.headers}
-            rowsPerPage={100}
-            totalRows={tableData.rows.length}
-            summary={tableData.summary}
-            onSort={this.handleSort}
+            title={ __("Top Countries", "wc-admin-sales-by-country") }
+            rows={ tableData.rows }
+            headers={ tableData.headers }
+            rowsPerPage={ 100 }
+            totalRows={ tableData.rows.length }
+            summary={ tableData.summary }
+            onSort={ this.handleSort }
         />
     }
 }
