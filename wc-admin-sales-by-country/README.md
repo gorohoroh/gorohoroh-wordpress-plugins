@@ -64,4 +64,4 @@ You can now start editing source code in your working copy of this repository. J
 * :white_check_mark: Refactor for readability.
 * Cover with tests.
 * :white_check_mark: Extend this README with install/activate/build instructions.
-* :white_check_mark: Write a [guide](tutorial/tutorial-sales_by_country.md) to document how you got there.
+* :white_check_mark: Write a [guide](https://gorohovsky.com/extending-woocommerce-javascript-react/) to document how you got there.
