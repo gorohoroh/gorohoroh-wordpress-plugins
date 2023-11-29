@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@woocommerce/components": "^4.0.0",
-    "@woocommerce/date": "^2.0.0",
+    "@woocommerce/date": "^2.1.0",
     "@woocommerce/settings": "^1.0.0",
     "@wordpress/api-fetch": "^3.11.0",
     "@wordpress/hooks": "^2.7.0",
