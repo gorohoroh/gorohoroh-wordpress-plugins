@@ -23,7 +23,7 @@
     "node-sass": "4.13.0"
   },
   "dependencies": {
-    "@woocommerce/components": "^4.0.0",
+    "@woocommerce/components": "^9.0.0",
     "@woocommerce/currency": "^2.0.0",
     "@woocommerce/settings": "^1.0.0",
     "@wordpress/hooks": "^2.7.0"
