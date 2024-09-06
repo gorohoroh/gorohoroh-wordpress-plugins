@@ -17,13 +17,13 @@
     "url": "https://github.com/gorohoroh/gorohoroh-wordpress-plugins/issues"
   },
   "dependencies": {
-    "@woocommerce/components": "^4.0.0",
+    "@woocommerce/components": "^10.1.0",
     "@woocommerce/date": "^2.0.0",
     "@woocommerce/settings": "^1.0.0",
-    "@wordpress/api-fetch": "^3.11.0",
+    "@wordpress/api-fetch": "^5.0.0",
     "@wordpress/hooks": "^2.7.0",
     "@wordpress/i18n": "^3.9.0",
-    "recharts": "^1.8.5"
+    "recharts": "^2.12.1"
   },
   "devDependencies": {
     "@wordpress/scripts": "^6.0.0",
